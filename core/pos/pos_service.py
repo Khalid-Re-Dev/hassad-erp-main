@@ -92,19 +92,21 @@ def calculate_totals(
         subtotal += line_subtotal
         line_discount_total += line_discount
     
+    # Base on which the global discount applies: subtotal net of line discounts.
+    # Global discount must NOT be applied to amounts already removed by line
+    # discounts, otherwise it double-discounts the line-discounted portion.
+    net_subtotal = subtotal - line_discount_total
+
     # Apply global discount
     global_discount = Decimal('0.00')
     if global_discount_percent:
-        global_discount = (subtotal * global_discount_percent / Decimal('100')).quantize(
+        global_discount = (net_subtotal * global_discount_percent / Decimal('100')).quantize(
             Decimal('0.01'), rounding=ROUND_HALF_UP
         )
     elif global_discount_amount:
         global_discount = Decimal(str(global_discount_amount)).quantize(
             Decimal('0.01'), rounding=ROUND_HALF_UP
         )
-    
-    # Calculate tax on discounted amount
-    taxable_amount = subtotal - line_discount_total - global_discount
     tax_total = Decimal('0.00')
     
     for line in lines:
@@ -123,9 +125,14 @@ def calculate_totals(
         
         line_after_discount = line_subtotal - line_discount
         
-        # Apply proportional global discount
-        if taxable_amount > 0:
-            line_global_discount = (line_after_discount / taxable_amount * global_discount).quantize(
+        # Apply proportional global discount. Allocate the global discount
+        # across lines in proportion to each line's amount AFTER its own line
+        # discount, relative to the net subtotal the global discount was based
+        # on. Using net_subtotal (not the post-global-discount taxable amount)
+        # as the denominator keeps the allocation consistent with how the
+        # global discount was computed.
+        if net_subtotal > 0:
+            line_global_discount = (line_after_discount / net_subtotal * global_discount).quantize(
                 Decimal('0.01'), rounding=ROUND_HALF_UP
             )
         else:
