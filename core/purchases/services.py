@@ -16,11 +16,14 @@ from models.purchases import (
     ApprovalRequest, SupplierPayment,
     POStatus, GRNStatus, InvoiceStatus, ApprovalStatus
 )
-from models.inventory import StockMovement, ProductBatch
-from models.base import Company, Branch, User, Product
+from models.inventory import StockMovement, ProductBatch, Product
+from models.company import Company
+from models.branch import Branch
+from models.user import User
 from core.purchases.schemas import (
     SupplierCreate, SupplierUpdate, SupplierCatalogCreate,
-    POCreate, POUpdate, GRNCreate, InvoiceCreate,
+    POLineSchema, POCreate, POUpdate, GRNCreate,
+    InvoiceLineSchema, InvoiceCreate,
     ApprovalRequestCreate, ApprovalActionSchema, PaymentCreate
 )
 from core.purchases.exceptions import (
