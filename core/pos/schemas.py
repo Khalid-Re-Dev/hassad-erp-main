@@ -4,7 +4,7 @@ Defines typed contracts for sales, payments, and receipts
 """
 from decimal import Decimal
 from datetime import datetime
-from typing import List, Optional
+from typing import Annotated, List, Optional
 from uuid import UUID
 from enum import Enum
 
@@ -38,8 +38,8 @@ class POSItemLine(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     quantity: Decimal = Field(..., gt=0, decimal_places=4)
     unit_price: Decimal = Field(..., ge=0, decimal_places=2)
-    discount_percent: Optional[Decimal] = Field(None, ge=0, le=100, decimal_places=2)
-    discount_amount: Optional[Decimal] = Field(None, ge=0, decimal_places=2)
+    discount_percent: Optional[Annotated[Decimal, Field(ge=0, le=100, decimal_places=2)]] = None
+    discount_amount: Optional[Annotated[Decimal, Field(ge=0, decimal_places=2)]] = None
     tax_rate: Decimal = Field(default=Decimal('0.00'), ge=0, le=100, decimal_places=2)
     
     # Optional batch tracking
@@ -132,8 +132,8 @@ class POSCreateRequest(BaseModel):
     customer_name: Optional[str] = Field(None, max_length=200)
     
     # Global discount (applied to entire invoice)
-    global_discount_percent: Optional[Decimal] = Field(None, ge=0, le=100, decimal_places=2)
-    global_discount_amount: Optional[Decimal] = Field(None, ge=0, decimal_places=2)
+    global_discount_percent: Optional[Annotated[Decimal, Field(ge=0, le=100, decimal_places=2)]] = None
+    global_discount_amount: Optional[Annotated[Decimal, Field(ge=0, decimal_places=2)]] = None
     
     # Notes
     notes: Optional[str] = None
