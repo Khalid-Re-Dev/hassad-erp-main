@@ -28,7 +28,7 @@ def _compile_pg_uuid_on_sqlite(element, compiler, **kw):  # pragma: no cover - D
 
 
 from models.base import Base
-from models.inventory import Product
+from models.inventory import Product, Unit
 from models.purchases import Supplier, PurchaseOrder, PurchaseOrderLine, PurchaseInvoice, PurchaseInvoiceLine, POStatus, InvoiceStatus
 from models.accounting import Account, AccountType
 import uuid
@@ -115,12 +115,23 @@ def test_user(db_session, test_company):
 def test_products(db_session, test_company):
     """Create test products"""
     import uuid
-    
+
+    # Products require a base unit (base_unit_id is NOT NULL), so create one.
+    unit = Unit(
+        id=uuid.uuid4(),
+        company_id=test_company.id,
+        name="Piece",
+        symbol="pc",
+    )
+    db_session.add(unit)
+    db_session.flush()
+
     products = []
     for i in range(3):
         product = Product(
             id=uuid.uuid4(),
             company_id=test_company.id,
+            base_unit_id=unit.id,
             sku=f"TEST-PROD-{i+1:03d}",
             barcode=f"123456789{i:03d}",
             name_en=f"Test Product {i+1}",
