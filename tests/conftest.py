@@ -63,7 +63,7 @@ def test_company(db_session):
     company = Company(
         id=uuid.uuid4(),
         name="Test Company Ltd",
-        legal_name="Test Company Limited",
+        trade_name="Test Company Limited",
         tax_id="300123456700003",
         currency="SAR",
         fiscal_year_start=1,
@@ -102,6 +102,8 @@ def test_user(db_session, test_company):
         username="testuser",
         email="test@example.com",
         password_hash="hashed_password",
+        first_name="Test",
+        last_name="User",
         is_active=True
     )
     db_session.add(user)
