@@ -7,6 +7,25 @@ This module provides shared fixtures and configuration for all tests.
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+
+
+# ---------------------------------------------------------------------------
+# SQLite compatibility for PostgreSQL UUID columns.
+#
+# Production runs on PostgreSQL, where models use the native postgresql.UUID
+# type. The test suite uses an in-memory SQLite engine for speed, and SQLite
+# has no native UUID type, so the default compiler raises
+# UnsupportedCompilationError. Registering a SQLite-only compilation rule lets
+# the same models create their tables on SQLite (stored as CHAR(32)) WITHOUT
+# changing any production model definition or PostgreSQL behaviour. The UUID
+# type's own bind/result processing still returns uuid.UUID objects.
+# ---------------------------------------------------------------------------
+@compiles(PG_UUID, "sqlite")
+def _compile_pg_uuid_on_sqlite(element, compiler, **kw):  # pragma: no cover - DDL hook
+    return "CHAR(32)"
+
 
 from models.base import Base
 from models.inventory import Product
@@ -39,7 +58,7 @@ def db_session(test_engine):
 @pytest.fixture
 def test_company(db_session):
     """Create a test company"""
-    from models.base import Company
+    from models.company import Company
     
     company = Company(
         id=uuid.uuid4(),
@@ -58,7 +77,7 @@ def test_company(db_session):
 @pytest.fixture
 def test_branch(db_session, test_company):
     """Create a test branch"""
-    from models.base import Branch
+    from models.branch import Branch
     
     branch = Branch(
         id=uuid.uuid4(),
@@ -75,7 +94,7 @@ def test_branch(db_session, test_company):
 @pytest.fixture
 def test_user(db_session, test_company):
     """Create a test user"""
-    from models.base import User
+    from models.user import User
     
     user = User(
         id=uuid.uuid4(),

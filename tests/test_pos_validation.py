@@ -12,7 +12,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from core.services.base_service import ValidationError
-from core.services.pos_service import PosService
+from core.services.pos_service import POSService as PosService
 
 
 def test_service_instantiation():
