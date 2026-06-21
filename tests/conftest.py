@@ -7,9 +7,28 @@ This module provides shared fixtures and configuration for all tests.
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+
+
+# ---------------------------------------------------------------------------
+# SQLite compatibility for PostgreSQL UUID columns.
+#
+# Production runs on PostgreSQL, where models use the native postgresql.UUID
+# type. The test suite uses an in-memory SQLite engine for speed, and SQLite
+# has no native UUID type, so the default compiler raises
+# UnsupportedCompilationError. Registering a SQLite-only compilation rule lets
+# the same models create their tables on SQLite (stored as CHAR(32)) WITHOUT
+# changing any production model definition or PostgreSQL behaviour. The UUID
+# type's own bind/result processing still returns uuid.UUID objects.
+# ---------------------------------------------------------------------------
+@compiles(PG_UUID, "sqlite")
+def _compile_pg_uuid_on_sqlite(element, compiler, **kw):  # pragma: no cover - DDL hook
+    return "CHAR(32)"
+
 
 from models.base import Base
-from models.inventory import Product
+from models.inventory import Product, Unit
 from models.purchases import Supplier, PurchaseOrder, PurchaseOrderLine, PurchaseInvoice, PurchaseInvoiceLine, POStatus, InvoiceStatus
 from models.accounting import Account, AccountType
 import uuid
@@ -27,24 +46,35 @@ def test_engine():
 
 
 @pytest.fixture(scope="function")
-def db_session(test_engine):
-    """Create a new database session for each test."""
-    TestSessionLocal = sessionmaker(bind=test_engine)
-    session = TestSessionLocal()
-    yield session
-    session.rollback()
-    session.close()
+def db_session():
+    """Create a fully isolated database session for each test.
+
+    Each test gets its own fresh in-memory SQLite database with a clean
+    schema. This guarantees per-test isolation regardless of commits made by
+    fixtures or the test body (committed rows cannot leak across tests and
+    cause spurious UNIQUE/constraint failures), which is essential for an
+    accounting system where test independence must be reliable.
+    """
+    engine = create_engine("sqlite:///:memory:", echo=False)
+    Base.metadata.create_all(engine)
+    session = Session(bind=engine)
+    try:
+        yield session
+    finally:
+        session.close()
+        Base.metadata.drop_all(engine)
+        engine.dispose()
 
 
 @pytest.fixture
 def test_company(db_session):
     """Create a test company"""
-    from models.base import Company
+    from models.company import Company
     
     company = Company(
         id=uuid.uuid4(),
         name="Test Company Ltd",
-        legal_name="Test Company Limited",
+        trade_name="Test Company Limited",
         tax_id="300123456700003",
         currency="SAR",
         fiscal_year_start=1,
@@ -58,7 +88,7 @@ def test_company(db_session):
 @pytest.fixture
 def test_branch(db_session, test_company):
     """Create a test branch"""
-    from models.base import Branch
+    from models.branch import Branch
     
     branch = Branch(
         id=uuid.uuid4(),
@@ -75,7 +105,7 @@ def test_branch(db_session, test_company):
 @pytest.fixture
 def test_user(db_session, test_company):
     """Create a test user"""
-    from models.base import User
+    from models.user import User
     
     user = User(
         id=uuid.uuid4(),
@@ -83,6 +113,8 @@ def test_user(db_session, test_company):
         username="testuser",
         email="test@example.com",
         password_hash="hashed_password",
+        first_name="Test",
+        last_name="User",
         is_active=True
     )
     db_session.add(user)
@@ -94,12 +126,23 @@ def test_user(db_session, test_company):
 def test_products(db_session, test_company):
     """Create test products"""
     import uuid
-    
+
+    # Products require a base unit (base_unit_id is NOT NULL), so create one.
+    unit = Unit(
+        id=uuid.uuid4(),
+        company_id=test_company.id,
+        name="Piece",
+        symbol="pc",
+    )
+    db_session.add(unit)
+    db_session.flush()
+
     products = []
     for i in range(3):
         product = Product(
             id=uuid.uuid4(),
             company_id=test_company.id,
+            base_unit_id=unit.id,
             sku=f"TEST-PROD-{i+1:03d}",
             barcode=f"123456789{i:03d}",
             name_en=f"Test Product {i+1}",
