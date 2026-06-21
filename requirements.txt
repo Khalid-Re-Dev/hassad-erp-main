@@ -1,0 +1,37 @@
+# Core Dependencies
+sqlalchemy==2.0.23
+alembic==1.13.1
+psycopg2-binary>=2.9.9
+pydantic==2.5.3
+pydantic-settings==2.1.0
+bcrypt==4.1.2
+python-dotenv==1.0.0
+python-dateutil==2.8.2
+pytz==2024.1
+
+# Development Dependencies
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.12.1
+flake8==7.0.0
+mypy==1.8.0
+isort==5.13.2
+
+# PyQt6 for desktop UI
+PyQt6>=6.6.1
+
+# ESC/POS printer support
+python-escpos==3.0
+
+# Barcode and QR code generation
+python-barcode==0.15.1
+qrcode[pil]==7.4.2
+
+# Image processing for receipt rendering
+Pillow>=10.2.0
+
+# PDF generation (placeholder for Phase 6)
+# weasyprint==60.2
+
+# Additional utilities
+segno==1.6.1  # Alternative QR code library

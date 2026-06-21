@@ -1,0 +1,417 @@
+"""
+Product Management Window.
+
+Provides CRUD operations for products and inventory items.
+"""
+
+from typing import Optional, Dict, Any
+from decimal import Decimal
+
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QPushButton, QTableWidget, QTableWidgetItem,
+    QLineEdit, QLabel, QMessageBox, QDialog,
+    QFormLayout, QComboBox, QCheckBox, QTextEdit,
+    QDoubleSpinBox
+)
+from sqlalchemy.orm import Session
+
+from core.database import SessionLocal
+from ui.base_ui import ModuleMainWindow
+from models.inventory import Product, Category, Unit
+from models import Company
+from core.services import get_product_service, ValidationError
+from core.db_utils import session_scope
+import logging
+import uuid
+
+
+class ProductDialog(QDialog):
+    """Dialog for creating/editing products."""
+    
+    def __init__(self, product: Optional[Product] = None, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self.product = product
+        self.is_edit = product is not None
+        self._setup_ui()
+        if self.is_edit:
+            self._load_product_data()
+    
+    def _setup_ui(self) -> None:
+        """Setup dialog UI."""
+        self.setWindowTitle("Edit Product" if self.is_edit else "Create Product")
+        self.setMinimumWidth(600)
+        
+        layout = QFormLayout()
+        
+        # SKU
+        self.sku_input = QLineEdit()
+        layout.addRow("SKU:", self.sku_input)
+        
+        # Barcode
+        self.barcode_input = QLineEdit()
+        layout.addRow("Barcode:", self.barcode_input)
+        
+        # Name (English)
+        self.name_en_input = QLineEdit()
+        layout.addRow("Name (English):", self.name_en_input)
+        
+        # Name (Arabic)
+        self.name_ar_input = QLineEdit()
+        layout.addRow("Name (Arabic):", self.name_ar_input)
+        
+        # Description
+        self.description_input = QTextEdit()
+        self.description_input.setMaximumHeight(80)
+        layout.addRow("Description:", self.description_input)
+        
+        # Category
+        self.category_combo = QComboBox()
+        self._load_categories()
+        layout.addRow("Category:", self.category_combo)
+        
+        # Base Unit
+        self.unit_combo = QComboBox()
+        self._load_units()
+        layout.addRow("Base Unit:", self.unit_combo)
+        
+        # Track Batches
+        self.track_batches_checkbox = QCheckBox("Track Batches")
+        layout.addRow("", self.track_batches_checkbox)
+        
+        # Track Expiry
+        self.track_expiry_checkbox = QCheckBox("Track Expiry")
+        layout.addRow("", self.track_expiry_checkbox)
+        
+        # Active status
+        self.active_checkbox = QCheckBox("Active")
+        self.active_checkbox.setChecked(True)
+        layout.addRow("Status:", self.active_checkbox)
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        save_btn = QPushButton("Save")
+        save_btn.clicked.connect(self.accept)
+        cancel_btn = QPushButton("Cancel")
+        cancel_btn.clicked.connect(self.reject)
+        button_layout.addWidget(save_btn)
+        button_layout.addWidget(cancel_btn)
+        
+        layout.addRow(button_layout)
+        self.setLayout(layout)
+    
+    def _load_categories(self) -> None:
+        """Load categories into combo box."""
+        db = SessionLocal()
+        try:
+            categories = db.query(Category).filter(Category.is_active == True).all()
+            self.category_combo.addItem("-- No Category --", None)
+            for category in categories:
+                self.category_combo.addItem(category.name_en, category.id)
+        finally:
+            db.close()
+    
+    def _load_units(self) -> None:
+        """Load units into combo box."""
+        db = SessionLocal()
+        try:
+            units = db.query(Unit).filter(Unit.is_active == True).all()
+            for unit in units:
+                self.unit_combo.addItem(f"{unit.name} ({unit.symbol})", unit.id)
+        finally:
+            db.close()
+    
+    def _load_product_data(self) -> None:
+        """Load existing product data into form."""
+        if not self.product:
+            return
+        
+        self.sku_input.setText(self.product.sku)
+        self.barcode_input.setText(self.product.barcode or "")
+        self.name_en_input.setText(self.product.name_en)
+        self.name_ar_input.setText(self.product.name_ar or "")
+        self.description_input.setPlainText(self.product.description or "")
+        self.track_batches_checkbox.setChecked(self.product.track_batches)
+        self.track_expiry_checkbox.setChecked(self.product.track_expiry)
+        self.active_checkbox.setChecked(self.product.is_active)
+        
+        # Set category
+        if self.product.category_id:
+            for i in range(self.category_combo.count()):
+                if self.category_combo.itemData(i) == self.product.category_id:
+                    self.category_combo.setCurrentIndex(i)
+                    break
+        
+        # Set unit
+        if self.product.base_unit_id:
+            for i in range(self.unit_combo.count()):
+                if self.unit_combo.itemData(i) == self.product.base_unit_id:
+                    self.unit_combo.setCurrentIndex(i)
+                    break
+    
+    def get_product_data(self) -> dict:
+        """Get product data from form."""
+        return {
+            "sku": self.sku_input.text().strip(),
+            "barcode": self.barcode_input.text().strip() or None,
+            "name_en": self.name_en_input.text().strip(),
+            "name_ar": self.name_ar_input.text().strip() or None,
+            "description": self.description_input.toPlainText().strip() or None,
+            "category_id": self.category_combo.currentData(),
+            "base_unit_id": self.unit_combo.currentData(),
+            "track_batches": self.track_batches_checkbox.isChecked(),
+            "track_expiry": self.track_expiry_checkbox.isChecked(),
+            "is_active": self.active_checkbox.isChecked()
+        }
+
+
+class ProductsWindow(ModuleMainWindow):
+    """Product management window."""
+    
+    def __init__(self, app_context: Optional[Dict[str, Any]] = None, parent: Optional[QWidget] = None):
+        super().__init__(app_context, parent)
+        self._setup_ui()
+        # Load data using the ModuleUI refresh_view method
+        self.refresh_view()
+    
+    def _setup_ui(self) -> None:
+        """Setup user interface."""
+        self.setWindowTitle("Product Management")
+        self.setMinimumSize(1200, 700)
+        
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Header
+        header_layout = QHBoxLayout()
+        title_label = QLabel("Products")
+        title_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        header_layout.addWidget(title_label)
+        header_layout.addStretch()
+        
+        # Search
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search products...")
+        self.search_input.setMaximumWidth(300)
+        self.search_input.textChanged.connect(self.refresh_view)
+        header_layout.addWidget(self.search_input)
+        
+        # Add button
+        add_btn = QPushButton("+ Add Product")
+        add_btn.clicked.connect(self._add_product)
+        header_layout.addWidget(add_btn)
+        
+        layout.addLayout(header_layout)
+        
+        # Table
+        self.table = QTableWidget()
+        self.table.setColumnCount(7)
+        self.table.setHorizontalHeaderLabels([
+            "SKU", "Barcode", "Name", "Category", "Unit", "Batches", "Status"
+        ])
+        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.table.doubleClicked.connect(self._edit_product)
+        layout.addWidget(self.table)
+        
+        # Action buttons
+        action_layout = QHBoxLayout()
+        action_layout.addStretch()
+        
+        edit_btn = QPushButton("Edit")
+        edit_btn.clicked.connect(self._edit_product)
+        action_layout.addWidget(edit_btn)
+        
+        delete_btn = QPushButton("Delete")
+        delete_btn.clicked.connect(self._delete_product)
+        action_layout.addWidget(delete_btn)
+        
+        layout.addLayout(action_layout)
+        
+        central_widget.setLayout(layout)
+    
+    def load_data(self, session: Session) -> None:
+        """Load products from database using provided session."""
+        query = session.query(Product)
+        
+        # Apply search filter
+        search_term = self.search_input.text().strip() if hasattr(self, 'search_input') else ""
+        if search_term:
+            query = query.filter(
+                (Product.sku.ilike(f"%{search_term}%")) |
+                (Product.barcode.ilike(f"%{search_term}%")) |
+                (Product.name_en.ilike(f"%{search_term}%")) |
+                (Product.name_ar.ilike(f"%{search_term}%"))
+            )
+        
+        products = query.order_by(Product.sku).all()
+        
+        if hasattr(self, 'table'):
+            self.table.setRowCount(len(products))
+            for row, product in enumerate(products):
+                self.table.setItem(row, 0, QTableWidgetItem(product.sku))
+                self.table.setItem(row, 1, QTableWidgetItem(product.barcode or ""))
+                self.table.setItem(row, 2, QTableWidgetItem(product.name_en))
+                # Safely access related objects
+                category_name = ""
+                unit_symbol = ""
+                try:
+                    category_name = product.category.name_en if product.category else ""
+                    unit_symbol = product.base_unit.symbol if product.base_unit else ""
+                except:
+                    pass
+                self.table.setItem(row, 3, QTableWidgetItem(category_name))
+                self.table.setItem(row, 4, QTableWidgetItem(unit_symbol))
+                self.table.setItem(row, 5, QTableWidgetItem("Yes" if product.track_batches else "No"))
+                self.table.setItem(row, 6, QTableWidgetItem("Active" if product.is_active else "Inactive"))
+                
+                # Store product ID in first column
+                self.table.item(row, 0).setData(Qt.ItemDataRole.UserRole, product.id)
+    
+    def _add_product(self) -> None:
+        """Show dialog to add new product."""
+        dialog = ProductDialog(parent=self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            data = dialog.get_product_data()
+            self._save_product(data)
+    
+    def _edit_product(self) -> None:
+        """Edit selected product."""
+        current_row = self.table.currentRow()
+        if current_row < 0:
+            QMessageBox.warning(self, "No Selection", "Please select a product to edit.")
+            return
+        
+        product_id = self.table.item(current_row, 0).data(Qt.ItemDataRole.UserRole)
+        
+        db = SessionLocal()
+        try:
+            product = db.query(Product).filter(Product.id == product_id).first()
+            if product:
+                dialog = ProductDialog(product=product, parent=self)
+                if dialog.exec() == QDialog.DialogCode.Accepted:
+                    data = dialog.get_product_data()
+                    self._update_product(product_id, data)
+        finally:
+            db.close()
+    
+    def _delete_product(self) -> None:
+        """Delete selected product via service layer."""
+        current_row = self.table.currentRow()
+        if current_row < 0:
+            QMessageBox.warning(self, "No Selection", "Please select a product to delete. | يرجى اختيار منتج للحذف.")
+            return
+        
+        sku = self.table.item(current_row, 0).text()
+        reply = QMessageBox.question(
+            self,
+            "Confirm Delete | تأكيد الحذف",
+            f"Are you sure you want to delete product '{sku}'?\n\nهل أنت متأكد من حذف المنتج '{sku}'؟",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            product_id = self.table.item(current_row, 0).data(Qt.ItemDataRole.UserRole)
+            service = get_product_service()
+            
+            try:
+                with session_scope() as session:
+                    success, errors = service.delete(session, product_id)
+                    
+                    if not success or errors:
+                        self._display_validation_errors(errors)
+                        return
+                    
+                    QMessageBox.information(
+                        self,
+                        "Success | نجاح",
+                        "Product deleted successfully.\n\nتم حذف المنتج بنجاح."
+                    )
+                    self.refresh_view()
+            except Exception as e:
+                error_id = str(uuid.uuid4())[:8]
+                logger = logging.getLogger(__name__)
+                logger.exception(f"Product deletion error {error_id}: {e}")
+                QMessageBox.critical(
+                    self,
+                    "Error | خطأ",
+                    f"Failed to delete product | فشل حذف المنتج\nError ID: {error_id}\nDetails: {str(e)}"
+                )
+    
+    def _display_validation_errors(self, errors: list) -> None:
+        """Show bilingual validation errors to the user."""
+        if not errors:
+            return
+        en_msgs = [f"- {e.get_message('en')} (field: {e.field})" for e in errors]
+        ar_msgs = [f"- {e.get_message('ar')} (الحقل: {e.field})" for e in errors]
+        message = (
+            "Validation errors occurred:\n" + "\n".join(en_msgs) +
+            "\n\nحدثت أخطاء في التحقق:\n" + "\n".join(ar_msgs)
+        )
+        QMessageBox.critical(self, "Validation | التحقق", message)
+    
+    def _save_product(self, data: dict) -> None:
+        """Save new product via service layer."""
+        service = get_product_service()
+        
+        # Add company_id from current user
+        from core.session_manager import session_manager
+        current_user = session_manager.get_active_user()
+        if current_user:
+            data['company_id'] = current_user.company_id
+        
+        try:
+            with session_scope() as session:
+                instance, errors = service.create(session, data)
+                
+                if errors:
+                    self._display_validation_errors(errors)
+                    return
+                
+                QMessageBox.information(
+                    self,
+                    "Success | نجاح",
+                    "Product created successfully.\n\nتم إنشاء المنتج بنجاح."
+                )
+                self.refresh_view()
+        except Exception as e:
+            error_id = str(uuid.uuid4())[:8]
+            logger = logging.getLogger(__name__)
+            logger.exception(f"Product creation error {error_id}: {e}")
+            QMessageBox.critical(
+                self,
+                "Error | خطأ",
+                f"Failed to create product | فشل إنشاء المنتج\nError ID: {error_id}\nDetails: {str(e)}"
+            )
+    
+    def _update_product(self, product_id, data: dict) -> None:
+        """Update existing product via service layer."""
+        service = get_product_service()
+        
+        try:
+            with session_scope() as session:
+                instance, errors = service.update(session, product_id, data)
+                
+                if errors:
+                    self._display_validation_errors(errors)
+                    return
+                
+                QMessageBox.information(
+                    self,
+                    "Success | نجاح",
+                    "Product updated successfully.\n\nتم تحديث المنتج بنجاح."
+                )
+                self.refresh_view()
+        except Exception as e:
+            error_id = str(uuid.uuid4())[:8]
+            logger = logging.getLogger(__name__)
+            logger.exception(f"Product update error {error_id}: {e}")
+            QMessageBox.critical(
+                self,
+                "Error | خطأ",
+                f"Failed to update product | فشل تحديث المنتج\nError ID: {error_id}\nDetails: {str(e)}"
+            )

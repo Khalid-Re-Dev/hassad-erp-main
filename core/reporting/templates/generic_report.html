@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html {% if language == 'ar' %}dir="rtl" lang="ar"{% else %}lang="en"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ data.title_ar if language == 'ar' else data.title_en }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: {% if language == 'ar' %}'Tajawal', 'Noto Naskh Arabic', {% endif %}Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            {% if language == 'ar' %}direction: rtl;{% endif %}
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #366092;
+            padding-bottom: 10px;
+        }
+        
+        .title {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #366092;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 12pt;
+            color: #666;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th {
+            background-color: #366092;
+            color: white;
+            padding: 10px;
+            text-align: {% if language == 'ar' %}right{% else %}left{% endif %};
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: {% if language == 'ar' %}right{% else %}left{% endif %};
+        }
+        
+        .number {
+            text-align: {% if language == 'ar' %}left{% else %}right{% endif %};
+            direction: ltr;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #f0f0f0;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 10pt;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">
+            {{ data.title_ar if language == 'ar' else data.title_en }}
+        </div>
+        <div class="subtitle">
+            {% if data.as_of_date %}
+                {{ 'كما في' if language == 'ar' else 'As of' }}: {{ data.as_of_date | format_date }}
+            {% elif data.date_from and data.date_to %}
+                {{ 'من' if language == 'ar' else 'From' }} {{ data.date_from | format_date }} 
+                {{ 'إلى' if language == 'ar' else 'to' }} {{ data.date_to | format_date }}
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if data.rows %}
+    <table>
+        <thead>
+            <tr>
+                {% for key in data.rows[0].keys() %}
+                <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data.rows %}
+            <tr>
+                {% for key, value in row.items() %}
+                <td {% if value is number %}class="number"{% endif %}>
+                    {% if value is number %}
+                        {{ value | format_decimal }}
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    <div class="footer">
+        {{ 'تم الإنشاء في' if language == 'ar' else 'Generated on' }}: {{ generated_at.strftime('%Y-%m-%d %H:%M:%S') }}
+    </div>
+</body>
+</html>

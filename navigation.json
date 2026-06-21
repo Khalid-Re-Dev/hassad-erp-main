@@ -1,0 +1,398 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "phase": "F2.4 - User Flow & Navigation",
+    "generated": "2025-11-16",
+    "description": "Hierarchical navigation structure following accounting process workflow"
+  },
+  "navigation_hierarchy": {
+    "workflow_order": [
+      "Company Setup → Branch Setup → User Management → Product Configuration → Sales Operations → Purchase Operations → Accounting & Finance → Reporting & Analytics"
+    ],
+    "principle": "Follow the logical sequence of setting up an ERP system: establish organizational structure first, then configure products, execute transactions, record financials, and finally generate reports."
+  },
+  "navigation_groups": [
+    {
+      "id": "setup",
+      "name": "Setup & Configuration",
+      "name_ar": "الإعداد والتكوين",
+      "icon": "⚙️",
+      "order": 1,
+      "color": "#3498db",
+      "description": "Foundational setup - must be configured first",
+      "collapsible": true,
+      "default_collapsed": false,
+      "modules": [
+        {
+          "id": "company",
+          "name": "Company Profile",
+          "name_ar": "ملف الشركة",
+          "icon": "🏢",
+          "module_path": "ui.company_window",
+          "class_name": "CompanyWindow",
+          "permission": "company.view",
+          "order": 1,
+          "tooltip": "Configure company information, legal details, and business settings",
+          "workflow_step": 1,
+          "required_for": ["branches", "users", "all_operations"]
+        },
+        {
+          "id": "branches",
+          "name": "Branches",
+          "name_ar": "الفروع",
+          "icon": "🏪",
+          "module_path": "ui.branches_window",
+          "class_name": "BranchesWindow",
+          "permission": "branches.view",
+          "order": 2,
+          "tooltip": "Manage business locations and branches",
+          "workflow_step": 2,
+          "depends_on": ["company"]
+        },
+        {
+          "id": "users",
+          "name": "Users",
+          "name_ar": "المستخدمون",
+          "icon": "👥",
+          "module_path": "ui.users_window",
+          "class_name": "UsersWindow",
+          "permission": "users.view",
+          "order": 3,
+          "tooltip": "Manage system users and access",
+          "workflow_step": 3,
+          "depends_on": ["company", "branches"]
+        },
+        {
+          "id": "roles",
+          "name": "Roles & Permissions",
+          "name_ar": "الأدوار والصلاحيات",
+          "icon": "🔐",
+          "module_path": "ui.roles_window",
+          "class_name": "RolesWindow",
+          "permission": "roles.view",
+          "order": 4,
+          "tooltip": "Configure user roles and permissions",
+          "workflow_step": 4,
+          "depends_on": ["users"]
+        },
+        {
+          "id": "settings",
+          "name": "System Settings",
+          "name_ar": "إعدادات النظام",
+          "icon": "⚙️",
+          "module_path": "ui.settings_window",
+          "class_name": "SettingsWindow",
+          "permission": "settings.view",
+          "order": 5,
+          "tooltip": "General system configuration",
+          "workflow_step": 5
+        }
+      ]
+    },
+    {
+      "id": "products",
+      "name": "Products & Inventory",
+      "name_ar": "المنتجات والمخزون",
+      "icon": "📦",
+      "order": 2,
+      "color": "#27ae60",
+      "description": "Product catalog and inventory management",
+      "collapsible": true,
+      "default_collapsed": false,
+      "modules": [
+        {
+          "id": "categories",
+          "name": "Product Categories",
+          "name_ar": "فئات المنتجات",
+          "icon": "📑",
+          "module_path": "ui.categories_window",
+          "class_name": "CategoriesWindow",
+          "permission": "inventory.view",
+          "order": 1,
+          "tooltip": "Organize products into categories",
+          "workflow_step": 6,
+          "depends_on": ["company"]
+        },
+        {
+          "id": "products",
+          "name": "Products",
+          "name_ar": "المنتجات",
+          "icon": "📦",
+          "module_path": "ui.products_window",
+          "class_name": "ProductsWindow",
+          "permission": "inventory.view",
+          "order": 2,
+          "tooltip": "Manage product catalog with pricing and details",
+          "workflow_step": 7,
+          "depends_on": ["categories"]
+        },
+        {
+          "id": "stock_movements",
+          "name": "Stock Movements",
+          "name_ar": "حركات المخزون",
+          "icon": "📊",
+          "module_path": "ui.stock_movements_window",
+          "class_name": "StockMovementsWindow",
+          "permission": "inventory.view",
+          "order": 3,
+          "tooltip": "Track inventory movements and adjustments",
+          "workflow_step": 8,
+          "depends_on": ["products"]
+        },
+        {
+          "id": "inventory_valuation",
+          "name": "Inventory Valuation",
+          "name_ar": "تقييم المخزون",
+          "icon": "💰",
+          "module_path": "ui.inventory_valuation_window",
+          "class_name": "InventoryValuationWindow",
+          "permission": "inventory.view",
+          "order": 4,
+          "tooltip": "Calculate and view inventory valuation",
+          "workflow_step": 9,
+          "depends_on": ["products", "stock_movements"]
+        }
+      ]
+    },
+    {
+      "id": "sales",
+      "name": "Sales Operations",
+      "name_ar": "عمليات المبيعات",
+      "icon": "🛒",
+      "order": 3,
+      "color": "#e74c3c",
+      "description": "Sales, customers, and point of sale",
+      "collapsible": true,
+      "default_collapsed": false,
+      "modules": [
+        {
+          "id": "customers",
+          "name": "Customers",
+          "name_ar": "العملاء",
+          "icon": "👤",
+          "module_path": "ui.customers_window",
+          "class_name": "CustomersWindow",
+          "permission": "sales.view",
+          "order": 1,
+          "tooltip": "Manage customer database",
+          "workflow_step": 10,
+          "depends_on": ["company"]
+        },
+        {
+          "id": "pos",
+          "name": "Point of Sale",
+          "name_ar": "نقطة البيع",
+          "icon": "💳",
+          "module_path": "ui.pos_interface_window",
+          "class_name": "POSInterfaceWindow",
+          "permission": "sales.view",
+          "order": 2,
+          "tooltip": "Process sales transactions",
+          "workflow_step": 11,
+          "depends_on": ["products", "customers"]
+        },
+        {
+          "id": "sales_history",
+          "name": "Sales History",
+          "name_ar": "سجل المبيعات",
+          "icon": "📈",
+          "module_path": "ui.sales_history_window",
+          "class_name": "SalesHistoryWindow",
+          "permission": "sales.view",
+          "order": 3,
+          "tooltip": "View and analyze sales transactions",
+          "workflow_step": 12,
+          "depends_on": ["pos"]
+        }
+      ]
+    },
+    {
+      "id": "purchases",
+      "name": "Purchase Operations",
+      "name_ar": "عمليات المشتريات",
+      "icon": "🚚",
+      "order": 4,
+      "color": "#9b59b6",
+      "description": "Suppliers, purchase orders, and goods receipt",
+      "collapsible": true,
+      "default_collapsed": false,
+      "modules": [
+        {
+          "id": "suppliers",
+          "name": "Suppliers",
+          "name_ar": "الموردون",
+          "icon": "🏭",
+          "module_path": "ui.suppliers_window",
+          "class_name": "SuppliersWindow",
+          "permission": "purchases.view",
+          "order": 1,
+          "tooltip": "Manage supplier database",
+          "workflow_step": 13,
+          "depends_on": ["company"]
+        },
+        {
+          "id": "purchase_orders",
+          "name": "Purchase Orders",
+          "name_ar": "أوامر الشراء",
+          "icon": "📝",
+          "module_path": "ui.purchase_orders_window",
+          "class_name": "PurchaseOrdersWindow",
+          "permission": "purchases.view",
+          "order": 2,
+          "tooltip": "Create and manage purchase orders",
+          "workflow_step": 14,
+          "depends_on": ["suppliers", "products"]
+        },
+        {
+          "id": "goods_receipt",
+          "name": "Goods Receipt",
+          "name_ar": "استلام البضائع",
+          "icon": "📥",
+          "module_path": "ui.goods_receipt_window",
+          "class_name": "GoodsReceiptWindow",
+          "permission": "purchases.view",
+          "order": 3,
+          "tooltip": "Receive goods from purchase orders",
+          "workflow_step": 15,
+          "depends_on": ["purchase_orders"]
+        },
+        {
+          "id": "purchase_invoices",
+          "name": "Purchase Invoices",
+          "name_ar": "فواتير الشراء",
+          "icon": "🧾",
+          "module_path": "ui.purchase_invoices_window",
+          "class_name": "PurchaseInvoicesWindow",
+          "permission": "purchases.view",
+          "order": 4,
+          "tooltip": "Process supplier invoices",
+          "workflow_step": 16,
+          "depends_on": ["goods_receipt"]
+        }
+      ]
+    },
+    {
+      "id": "accounting",
+      "name": "Accounting & Finance",
+      "name_ar": "المحاسبة والمالية",
+      "icon": "💼",
+      "order": 5,
+      "color": "#f39c12",
+      "description": "Chart of accounts, journals, and financial reports",
+      "collapsible": true,
+      "default_collapsed": false,
+      "modules": [
+        {
+          "id": "accounts",
+          "name": "Chart of Accounts",
+          "name_ar": "دليل الحسابات",
+          "icon": "📊",
+          "module_path": "ui.accounts_window",
+          "class_name": "AccountsWindow",
+          "permission": "accounting.view",
+          "order": 1,
+          "tooltip": "Manage accounting chart of accounts",
+          "workflow_step": 17,
+          "depends_on": ["company"]
+        },
+        {
+          "id": "journals",
+          "name": "Journal Entries",
+          "name_ar": "القيود اليومية",
+          "icon": "📖",
+          "module_path": "ui.journals_window",
+          "class_name": "JournalsWindow",
+          "permission": "accounting.view",
+          "order": 2,
+          "tooltip": "Record manual journal entries",
+          "workflow_step": 18,
+          "depends_on": ["accounts"]
+        },
+        {
+          "id": "trial_balance",
+          "name": "Trial Balance",
+          "name_ar": "ميزان المراجعة",
+          "icon": "⚖️",
+          "module_path": "ui.trial_balance_window",
+          "class_name": "TrialBalanceWindow",
+          "permission": "accounting.view",
+          "order": 3,
+          "tooltip": "View trial balance and account summaries",
+          "workflow_step": 19,
+          "depends_on": ["accounts", "journals"]
+        }
+      ]
+    },
+    {
+      "id": "reports",
+      "name": "Reports & Analytics",
+      "name_ar": "التقارير والتحليلات",
+      "icon": "📊",
+      "order": 6,
+      "color": "#1abc9c",
+      "description": "Financial reports, analytics, and insights",
+      "collapsible": true,
+      "default_collapsed": false,
+      "modules": [
+        {
+          "id": "reports",
+          "name": "Reports",
+          "name_ar": "التقارير",
+          "icon": "📋",
+          "module_path": "ui.reports_window",
+          "class_name": "ReportsWindow",
+          "permission": "reports.view",
+          "order": 1,
+          "tooltip": "Generate and view system reports",
+          "workflow_step": 20,
+          "depends_on": ["all_modules"]
+        }
+      ]
+    }
+  ],
+  "quick_actions": [
+    {
+      "id": "new_sale",
+      "name": "New Sale",
+      "name_ar": "بيع جديد",
+      "icon": "🛒",
+      "target_module": "pos",
+      "shortcut": "Ctrl+N",
+      "permission": "sales.create"
+    },
+    {
+      "id": "new_purchase",
+      "name": "New Purchase",
+      "name_ar": "شراء جديد",
+      "icon": "📝",
+      "target_module": "purchase_orders",
+      "shortcut": "Ctrl+Shift+N",
+      "permission": "purchases.create"
+    },
+    {
+      "id": "new_journal",
+      "name": "New Journal Entry",
+      "name_ar": "قيد جديد",
+      "icon": "📖",
+      "target_module": "journals",
+      "shortcut": "Ctrl+J",
+      "permission": "accounting.create"
+    },
+    {
+      "id": "view_reports",
+      "name": "View Reports",
+      "name_ar": "عرض التقارير",
+      "icon": "📊",
+      "target_module": "reports",
+      "shortcut": "Ctrl+R",
+      "permission": "reports.view"
+    }
+  ],
+  "breadcrumb_config": {
+    "enabled": true,
+    "show_home": true,
+    "separator": "›",
+    "max_depth": 4,
+    "show_module_icon": true
+  }
+}

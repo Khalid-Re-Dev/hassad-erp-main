@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "hassad-erp"
+version = "0.1.0"
+description = "Hassad System - Professional Offline-First Desktop POS & ERP Accounting System"
+authors = ["Hassad Development Team"]
+readme = "README.md"
+python = "^3.11"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "^2.0.23"
+alembic = "^1.13.1"
+psycopg2-binary = "^2.9.9"
+pydantic = "^2.5.3"
+pydantic-settings = "^2.1.0"
+bcrypt = "^4.1.2"
+python-dotenv = "^1.0.0"
+python-dateutil = "^2.8.2"
+pytz = "^2024.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-asyncio = "^0.21.1"
+black = "^23.12.1"
+flake8 = "^7.0.0"
+mypy = "^1.8.0"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

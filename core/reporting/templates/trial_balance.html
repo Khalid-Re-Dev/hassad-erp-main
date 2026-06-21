@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html {% if language == 'ar' %}dir="rtl" lang="ar"{% else %}lang="en"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ data.title_ar if language == 'ar' else data.title_en }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: {% if language == 'ar' %}'Tajawal', 'Noto Naskh Arabic', {% endif %}Arial, sans-serif;
+            font-size: 11pt;
+            {% if language == 'ar' %}direction: rtl;{% endif %}
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #366092;
+            padding-bottom: 15px;
+        }
+        
+        .title {
+            font-size: 22pt;
+            font-weight: bold;
+            color: #366092;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 13pt;
+            color: #666;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th {
+            background-color: #366092;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #2a4d73;
+        }
+        
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        .text-cell {
+            text-align: {% if language == 'ar' %}right{% else %}left{% endif %};
+        }
+        
+        .number-cell {
+            text-align: right;
+            direction: ltr;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #f0f0f0;
+            border-top: 2px solid #366092;
+        }
+        
+        .balance-check {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        
+        .balanced {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .unbalanced {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 9pt;
+            color: #999;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">
+            {{ data.title_ar if language == 'ar' else data.title_en }}
+        </div>
+        <div class="subtitle">
+            {{ 'كما في' if language == 'ar' else 'As of' }}: {{ data.as_of_date | format_date }}
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 10%;">{{ 'الرمز' if language == 'ar' else 'Code' }}</th>
+                <th style="width: 40%;">{{ 'اسم الحساب' if language == 'ar' else 'Account Name' }}</th>
+                <th style="width: 15%;">{{ 'النوع' if language == 'ar' else 'Type' }}</th>
+                <th style="width: 17.5%;">{{ 'مدين' if language == 'ar' else 'Debit' }}</th>
+                <th style="width: 17.5%;">{{ 'دائن' if language == 'ar' else 'Credit' }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data.rows %}
+            <tr>
+                <td class="text-cell">{{ row.account_code }}</td>
+                <td class="text-cell">{{ row.account_name_ar if language == 'ar' else row.account_name_en }}</td>
+                <td class="text-cell">{{ row.account_type }}</td>
+                <td class="number-cell">{{ row.debit | format_decimal }}</td>
+                <td class="number-cell">{{ row.credit | format_decimal }}</td>
+            </tr>
+            {% endfor %}
+            
+            <tr class="total-row">
+                <td colspan="3" class="text-cell">{{ 'المجموع' if language == 'ar' else 'TOTAL' }}</td>
+                <td class="number-cell">{{ data.total_debits | format_decimal }}</td>
+                <td class="number-cell">{{ data.total_credits | format_decimal }}</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="balance-check {% if data.balanced %}balanced{% else %}unbalanced{% endif %}">
+        {% if data.balanced %}
+            {{ '✓ الميزان متوازن' if language == 'ar' else '✓ Trial Balance is Balanced' }}
+        {% else %}
+            {{ '✗ الميزان غير متوازن' if language == 'ar' else '✗ Trial Balance is NOT Balanced' }}
+        {% endif %}
+    </div>
+    
+    <div class="footer">
+        {{ 'تم الإنشاء بواسطة نظام حصاد' if language == 'ar' else 'Generated by Hassad ERP System' }} | 
+        {{ generated_at.strftime('%Y-%m-%d %H:%M:%S') }}
+    </div>
+</body>
+</html>

@@ -1,0 +1,138 @@
+# GENERATED/UPDATED BY PHASE B RESUME: 2025-11-02T07:27:06Z
+"""
+Inventory Valuation Window.
+
+Provides inventory valuation reports and cost analysis.
+
+TODO: Business Logic Implementation
+- Valuation method selection (FIFO, LIFO, Average)
+- Stock valuation calculation
+- Cost analysis reports
+"""
+
+from typing import Optional, Dict, Any
+from sqlalchemy.orm import Session
+
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
+    QTableWidget, QTableWidgetItem, QLineEdit, QLabel
+)
+
+from ui.base_ui import ModuleWidget
+from models import Product, StockMovement
+
+
+class InventoryValuationWindow(ModuleWidget):
+    """
+    Inventory Valuation management window.
+    
+    Features:
+    - Inventory valuation
+    - Multiple valuation methods
+    - Cost analysis
+    - Valuation reports
+    
+    TODO: Add comprehensive inventory_valuation functionality
+    """
+    
+    def __init__(self, app_context: Optional[Dict[str, Any]] = None, parent: Optional[QWidget] = None):
+        super().__init__(app_context, parent)
+        self.setWindowTitle("Inventory Valuation | تقييم المخزون")
+        self._setup_ui()
+        
+    def _setup_ui(self):
+        """Setup user interface."""
+        # Header
+        header_layout = QHBoxLayout()
+        title_label = QLabel("Inventory Valuation | تقييم المخزون")
+        title_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        header_layout.addWidget(title_label)
+        header_layout.addStretch()
+        
+        # Search
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search products... | البحث في المنتجات...")
+        self.search_input.setMaximumWidth(300)
+        self.search_input.textChanged.connect(self.refresh_view)
+        header_layout.addWidget(self.search_input)
+        
+        # Action button
+        add_btn = QPushButton("Calculate Valuation | حساب التقييم")
+        add_btn.clicked.connect(self._calculate_valuation)
+        header_layout.addWidget(add_btn)
+        
+        self.main_layout.addLayout(header_layout)
+        
+        # Table
+        self.table = QTableWidget()
+        self.table.setColumnCount(6)
+        self.table.setHorizontalHeaderLabels(["Product | المنتج", "Quantity | الكمية", "Cost | التكلفة", "Total Value | القيمة الإجمالية", "Method | الطريقة", "Date | التاريخ"])
+        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.main_layout.addWidget(self.table)
+        
+        # Action buttons
+        action_layout = QHBoxLayout()
+        action_layout.addStretch()
+        
+        view_btn = QPushButton("View | عرض")
+        view_btn.clicked.connect(self._view_item)
+        action_layout.addWidget(view_btn)
+        
+        self.main_layout.addLayout(action_layout)
+        
+    def load_data(self, session: Session) -> None:
+        """
+        Load inventory_valuation data from database.
+        
+        Args:
+            session: Database session
+        """
+        try:
+            # Query Product model
+            query = session.query(Product)
+            
+            # Apply search filter if applicable
+            search_term = self.search_input.text().strip() if hasattr(self, 'search_input') else ""
+            if search_term:
+                # TODO: Add search filter based on model fields
+                pass
+            
+            results = query.limit(100).all()
+            
+            if hasattr(self, 'table'):
+                self.table.setRowCount(len(results))
+                for row, item in enumerate(results):
+                    # TODO: Populate table columns with actual data
+                    self.table.setItem(row, 0, QTableWidgetItem(str(getattr(item, 'id', ''))))
+                    self.table.setItem(row, 1, QTableWidgetItem(str(getattr(item, 'name', 'N/A'))))
+                    
+        except Exception as e:
+            self._show_error(f"Failed to load inventory_valuation data: {str(e)}")
+            raise
+    
+    def _calculate_valuation(self):
+        """Add new inventory valuation."""
+        self._show_info(
+            "Add Inventory Valuation functionality not yet implemented.\\n"
+            "This will open a dialog to create a new inventory valuation.\\n\\n"
+            "وظيفة إضافة تقييم المخزون لم يتم تنفيذها بعد.\\n"
+            "ستفتح نافذة حوار لإنشاء تقييم المخزون جديد.",
+            "Coming Soon | قريباً"
+        )
+    
+    def _view_item(self):
+        """View selected inventory valuation."""
+        current_row = self.table.currentRow()
+        if current_row < 0:
+            self._show_warning("Please select an item to view. | يرجى اختيار عنصر للعرض.")
+            return
+            
+        self._show_info(
+            "View Inventory Valuation functionality not yet implemented.\\n"
+            "This will show detailed information.\\n\\n"
+            "وظيفة عرض تقييم المخزون لم يتم تنفيذها بعد.\\n"
+            "ستعرض معلومات مفصلة.",
+            "Coming Soon | قريباً"
+        )

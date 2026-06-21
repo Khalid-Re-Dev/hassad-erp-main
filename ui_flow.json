@@ -1,0 +1,339 @@
+{
+  "metadata": {
+    "generated_at": "2025-11-09T13:17:55Z",
+    "purpose": "UI Navigation Flow & Dependency Map for Hassad ERP",
+    "description": "Maps user navigation flows, module relationships, and UI-Service dependencies"
+  },
+  "navigation_structure": {
+    "entry_point": "login_window",
+    "main_dashboard": "main_window",
+    "navigation_type": "hierarchical_sidebar_with_breadcrumbs",
+    "navigation_config_file": "navigation.json",
+    "features": [
+      "collapsible_groups",
+      "breadcrumb_navigation",
+      "toolbar_quick_actions",
+      "permission_based_filtering",
+      "accounting_workflow_order"
+    ],
+    "workflow_order": [
+      "Setup & Configuration",
+      "Products & Inventory",
+      "Sales Operations",
+      "Purchase Operations",
+      "Accounting & Finance",
+      "Reports & Analytics"
+    ],
+    "module_registry": {
+      "dashboard": {
+        "module_path": "ui.main_window",
+        "class_name": "WelcomePage",
+        "permission_required": "dashboard.view",
+        "navigation_group": "Core",
+        "group_order": 0,
+        "accessible_from": []
+      },
+      "users": {
+        "module_path": "ui.users_window",
+        "class_name": "UsersWindow",
+        "permission_required": "users.view",
+        "navigation_group": "Setup & Configuration",
+        "group_order": 1,
+        "module_order": 3,
+        "accessible_from": ["dashboard", "roles", "branches"]
+      },
+      "roles": {
+        "module_path": "ui.roles_window",
+        "class_name": "RolesWindow",
+        "permission_required": "roles.view",
+        "navigation_group": "Setup & Configuration",
+        "group_order": 1,
+        "module_order": 4,
+        "accessible_from": ["dashboard", "users"]
+      },
+      "company": {
+        "module_path": "ui.company_window",
+        "class_name": "CompanyWindow",
+        "permission_required": "company.view",
+        "navigation_group": "Setup & Configuration",
+        "group_order": 1,
+        "module_order": 1,
+        "accessible_from": ["dashboard", "settings", "branches"]
+      },
+      "branches": {
+        "module_path": "ui.branches_window",
+        "class_name": "BranchesWindow",
+        "permission_required": "branches.view",
+        "navigation_group": "Setup & Configuration",
+        "group_order": 1,
+        "module_order": 2,
+        "accessible_from": ["dashboard", "company", "users"]
+      },
+      "accounts": {
+        "module_path": "ui.accounts_window",
+        "class_name": "AccountsWindow",
+        "permission_required": "accounting.view",
+        "navigation_group": "Accounting & Finance",
+        "group_order": 5,
+        "module_order": 1,
+        "accessible_from": ["dashboard", "journals", "trial_balance"]
+      },
+      "journals": {
+        "module_path": "ui.journals_window",
+        "class_name": "JournalsWindow",
+        "permission_required": "accounting.view",
+        "navigation_group": "Accounting & Finance",
+        "group_order": 5,
+        "module_order": 2,
+        "accessible_from": ["dashboard", "accounts", "trial_balance"]
+      },
+      "trial_balance": {
+        "module_path": "ui.trial_balance_window",
+        "class_name": "TrialBalanceWindow",
+        "permission_required": "accounting.view",
+        "navigation_group": "Accounting & Finance",
+        "group_order": 5,
+        "module_order": 3,
+        "accessible_from": ["dashboard", "accounts", "journals"]
+      },
+      "products": {
+        "module_path": "ui.products_window",
+        "class_name": "ProductsWindow",
+        "permission_required": "inventory.view",
+        "navigation_group": "Products & Inventory",
+        "group_order": 2,
+        "module_order": 2,
+        "accessible_from": ["dashboard", "categories", "stock_movements", "pos"]
+      },
+      "categories": {
+        "module_path": "ui.categories_window",
+        "class_name": "CategoriesWindow",
+        "permission_required": "inventory.view",
+        "navigation_group": "Products & Inventory",
+        "group_order": 2,
+        "module_order": 1,
+        "accessible_from": ["dashboard", "products"]
+      },
+      "stock_movements": {
+        "module_path": "ui.stock_movements_window",
+        "class_name": "StockMovementsWindow",
+        "permission_required": "inventory.view",
+        "navigation_group": "Products & Inventory",
+        "group_order": 2,
+        "module_order": 3,
+        "accessible_from": ["dashboard", "products", "inventory_valuation"]
+      },
+      "inventory_valuation": {
+        "module_path": "ui.inventory_valuation_window",
+        "class_name": "InventoryValuationWindow",
+        "permission_required": "inventory.view",
+        "navigation_group": "Products & Inventory",
+        "group_order": 2,
+        "module_order": 4,
+        "accessible_from": ["dashboard", "stock_movements", "products"]
+      },
+      "pos": {
+        "module_path": "ui.pos_interface_window",
+        "class_name": "POSInterfaceWindow",
+        "permission_required": "sales.view",
+        "navigation_group": "Sales Operations",
+        "group_order": 3,
+        "module_order": 2,
+        "accessible_from": ["dashboard", "sales_history", "customers"]
+      },
+      "sales_history": {
+        "module_path": "ui.sales_history_window",
+        "class_name": "SalesHistoryWindow",
+        "permission_required": "sales.view",
+        "navigation_group": "Sales Operations",
+        "group_order": 3,
+        "module_order": 3,
+        "accessible_from": ["dashboard", "pos", "customers"]
+      },
+      "customers": {
+        "module_path": "ui.customers_window",
+        "class_name": "CustomersWindow",
+        "permission_required": "sales.view",
+        "navigation_group": "Sales Operations",
+        "group_order": 3,
+        "module_order": 1,
+        "accessible_from": ["dashboard", "pos", "sales_history"]
+      },
+      "suppliers": {
+        "module_path": "ui.suppliers_window",
+        "class_name": "SuppliersWindow",
+        "permission_required": "purchases.view",
+        "navigation_group": "Purchase Operations",
+        "group_order": 4,
+        "module_order": 1,
+        "accessible_from": ["dashboard", "purchase_orders", "goods_receipt"]
+      },
+      "purchase_orders": {
+        "module_path": "ui.purchase_orders_window",
+        "class_name": "PurchaseOrdersWindow",
+        "permission_required": "purchases.view",
+        "navigation_group": "Purchase Operations",
+        "group_order": 4,
+        "module_order": 2,
+        "accessible_from": ["dashboard", "suppliers", "goods_receipt", "purchase_invoices"]
+      },
+      "goods_receipt": {
+        "module_path": "ui.goods_receipt_window",
+        "class_name": "GoodsReceiptWindow",
+        "permission_required": "purchases.view",
+        "navigation_group": "Purchase Operations",
+        "group_order": 4,
+        "module_order": 3,
+        "accessible_from": ["dashboard", "purchase_orders", "suppliers"]
+      },
+      "purchase_invoices": {
+        "module_path": "ui.purchase_invoices_window",
+        "class_name": "PurchaseInvoicesWindow",
+        "permission_required": "purchases.view",
+        "navigation_group": "Purchase Operations",
+        "group_order": 4,
+        "module_order": 4,
+        "accessible_from": ["dashboard", "purchase_orders", "suppliers"]
+      },
+      "reports": {
+        "module_path": "ui.reports_window",
+        "class_name": "ReportsWindow",
+        "permission_required": "reports.view",
+        "navigation_group": "Reports & Analytics",
+        "group_order": 6,
+        "module_order": 1,
+        "accessible_from": ["dashboard"]
+      },
+      "settings": {
+        "module_path": "ui.settings_window",
+        "class_name": "SettingsWindow",
+        "permission_required": "settings.view",
+        "navigation_group": "Setup & Configuration",
+        "group_order": 1,
+        "module_order": 5,
+        "accessible_from": ["dashboard", "company"]
+      }
+    }
+  },
+  "ui_service_mappings": {
+    "company_window": {
+      "ui_class": "CompanyWindow",
+      "base_class": "ModuleWidget",
+      "service": "CompanyService",
+      "service_getter": "get_company_service",
+      "crud_operations": ["create", "update", "get_all"],
+      "key_methods": ["load_data", "_save_company", "_collect_form_data"],
+      "data_flow": "UI Form → CompanyService.update/create → Company Model → Database"
+    },
+    "users_window": {
+      "ui_class": "UsersWindow",
+      "base_class": "ModuleMainWindow",
+      "service": "UserService",
+      "service_getter": "get_user_service",
+      "crud_operations": ["create", "update", "delete", "get_all"],
+      "key_methods": ["load_data", "_save_user", "_update_user", "_delete_user"],
+      "data_flow": "UI Table ↔ UserService (CRUD) ↔ User Model ↔ Database"
+    },
+    "branches_window": {
+      "ui_class": "BranchesWindow",
+      "base_class": "ModuleWidget",
+      "service": "BranchService",
+      "service_getter": "get_branch_service",
+      "crud_operations": ["create", "update", "delete", "get_all"],
+      "key_methods": ["load_data", "_save_branch", "_update_branch", "_delete_branch"],
+      "data_flow": "UI Table ↔ BranchService (CRUD) ↔ Branch Model ↔ Database"
+    },
+    "products_window": {
+      "ui_class": "ProductsWindow",
+      "base_class": "ModuleMainWindow",
+      "service": "ProductService",
+      "service_getter": "get_product_service",
+      "crud_operations": ["create", "update", "delete", "get_all"],
+      "key_methods": ["load_data", "_save_product", "_update_product", "_delete_product"],
+      "data_flow": "UI Table ↔ ProductService (CRUD) ↔ Product Model ↔ Database"
+    },
+    "roles_window": {
+      "ui_class": "RolesWindow",
+      "base_class": "ModuleWidget",
+      "service": "RoleService",
+      "service_getter": "get_role_service",
+      "crud_operations": ["create", "update", "delete", "get_all"],
+      "key_methods": ["load_data", "_add_role", "_edit_role", "_delete_role"],
+      "data_flow": "UI Table ↔ RoleService (CRUD) ↔ Role Model ↔ Database"
+    },
+    "accounts_window": {
+      "ui_class": "AccountsWindow",
+      "base_class": "ModuleWidget",
+      "service": "AccountService",
+      "service_getter": "get_account_service",
+      "crud_operations": ["get_all"],
+      "key_methods": ["load_data", "_add_account", "_view_item"],
+      "data_flow": "UI Table ← AccountService.get_all ← Account Model ← Database",
+      "status": "Partially implemented - Create/Update not yet implemented"
+    },
+    "journals_window": {
+      "ui_class": "JournalsWindow",
+      "base_class": "ModuleWidget",
+      "service": "JournalService",
+      "service_getter": "get_journal_service",
+      "crud_operations": ["get_all"],
+      "key_methods": ["load_data", "_add_entry", "_view_item"],
+      "data_flow": "UI Table ← JournalService.get_all ← JournalEntry Model ← Database",
+      "status": "Partially implemented - Create/Update not yet implemented"
+    }
+  },
+  "modernization_groups": {
+    "Group_A_Core_Setup": {
+      "priority": 1,
+      "description": "Core system setup and configuration",
+      "modules": ["company", "branches", "users", "roles"],
+      "dependencies": [],
+      "modernization_notes": "These are foundational modules - must be completed first"
+    },
+    "Group_B_Accounting": {
+      "priority": 2,
+      "description": "Accounting and financial management",
+      "modules": ["accounts", "journals", "trial_balance"],
+      "dependencies": ["Group_A_Core_Setup"],
+      "modernization_notes": "Requires Group A for company/branch context"
+    },
+    "Group_C_Inventory": {
+      "priority": 3,
+      "description": "Inventory and product management",
+      "modules": ["products", "categories", "stock_movements", "inventory_valuation"],
+      "dependencies": ["Group_A_Core_Setup"],
+      "modernization_notes": "Can be modernized in parallel with Group B"
+    },
+    "Group_D_Sales": {
+      "priority": 4,
+      "description": "Sales and point of sale operations",
+      "modules": ["pos", "sales_history", "customers"],
+      "dependencies": ["Group_C_Inventory"],
+      "modernization_notes": "Requires inventory system to be functional"
+    },
+    "Group_E_Purchases": {
+      "priority": 4,
+      "description": "Purchasing and supplier management",
+      "modules": ["suppliers", "purchase_orders", "goods_receipt", "purchase_invoices"],
+      "dependencies": ["Group_C_Inventory"],
+      "modernization_notes": "Can be modernized in parallel with Group D"
+    },
+    "Group_F_Reports": {
+      "priority": 5,
+      "description": "Reporting and analytics",
+      "modules": ["reports", "settings"],
+      "dependencies": ["Group_B_Accounting", "Group_C_Inventory", "Group_D_Sales", "Group_E_Purchases"],
+      "modernization_notes": "Should be last as it depends on all other modules"
+    }
+  },
+  "compatibility_notes": {
+    "all_windows_use_pyqt6": true,
+    "all_windows_use_base_ui": true,
+    "session_management_consistent": true,
+    "bilingual_support_consistent": true,
+    "error_handling_consistent": true,
+    "service_layer_separation": true,
+    "modernization_ready": true,
+    "breaking_changes_expected": false
+  }
+}

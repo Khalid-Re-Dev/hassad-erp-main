@@ -1,0 +1,444 @@
+/*
+ * Hassad ERP - RTL (Right-to-Left) Theme Extension
+ * Arabic language layout support with proper text alignment and UI mirroring
+ * Compatible with both Light and Dark themes
+ * Version: 1.0.0
+ * Phase: F2.1 - Theme Engine Implementation
+ */
+
+/* ============================================================================
+   RTL GLOBAL DIRECTION & ALIGNMENT
+   ============================================================================ */
+
+* {
+    qproperty-layoutDirection: RightToLeft;
+}
+
+QWidget {
+    qproperty-layoutDirection: RightToLeft;
+}
+
+/* ============================================================================
+   TEXT ALIGNMENT - RTL
+   ============================================================================ */
+
+QLabel {
+    qproperty-alignment: 'AlignRight | AlignVCenter';
+}
+
+QLineEdit, QTextEdit, QPlainTextEdit {
+    qproperty-alignment: AlignRight;
+}
+
+QSpinBox, QDoubleSpinBox {
+    qproperty-alignment: AlignRight;
+}
+
+/* ============================================================================
+   BUTTONS - RTL PADDING ADJUSTMENTS
+   ============================================================================ */
+
+QPushButton {
+    /* Maintain symmetric padding for buttons */
+    padding: 8px 16px 8px 16px;
+    text-align: center;
+}
+
+QPushButton[icon="true"] {
+    /* Icon buttons remain centered */
+    padding: 6px;
+}
+
+/* ============================================================================
+   COMBO BOX - RTL DROPDOWN
+   ============================================================================ */
+
+QComboBox {
+    /* Padding adjusted for RTL */
+    padding: 6px 30px 6px 10px;
+}
+
+QComboBox::drop-down {
+    /* Move dropdown arrow to left side */
+    subcontrol-origin: padding;
+    subcontrol-position: left center;
+    left: 0px;
+    right: auto;
+    border-left: 1px solid #bdc3c7;
+    border-right: none;
+}
+
+QComboBox::down-arrow {
+    /* Keep arrow centered in its area */
+    margin-left: 5px;
+}
+
+/* Dark theme variant */
+QComboBox[dark="true"]::drop-down {
+    border-left: 1px solid #616161;
+}
+
+/* ============================================================================
+   SPIN BOX - RTL BUTTON POSITIONS
+   ============================================================================ */
+
+QSpinBox::up-button, QDoubleSpinBox::up-button,
+QDateEdit::up-button, QTimeEdit::up-button, QDateTimeEdit::up-button {
+    /* Move to left side */
+    subcontrol-origin: padding;
+    subcontrol-position: left center;
+    left: 0px;
+    border-right: 1px solid #bdc3c7;
+    border-left: none;
+    border-radius: 4px 0px 0px 0px;
+}
+
+QSpinBox::down-button, QDoubleSpinBox::down-button,
+QDateEdit::down-button, QTimeEdit::down-button, QDateTimeEdit::down-button {
+    /* Move to left side below up button */
+    subcontrol-origin: padding;
+    subcontrol-position: left center;
+    left: 0px;
+    border-right: 1px solid #bdc3c7;
+    border-left: none;
+    border-radius: 0px 0px 0px 4px;
+}
+
+/* Dark theme variant */
+QSpinBox[dark="true"]::up-button, QDoubleSpinBox[dark="true"]::up-button {
+    border-right: 1px solid #616161;
+}
+
+QSpinBox[dark="true"]::down-button, QDoubleSpinBox[dark="true"]::down-button {
+    border-right: 1px solid #616161;
+}
+
+/* ============================================================================
+   TABLES - RTL ALIGNMENT
+   ============================================================================ */
+
+QTableWidget, QTableView {
+    /* Tables naturally handle RTL with layoutDirection */
+}
+
+QHeaderView::section {
+    /* Header text alignment */
+    text-align: right;
+    padding-right: 12px;
+    padding-left: 4px;
+}
+
+QTableWidget::item, QTableView::item {
+    /* Cell content alignment */
+    text-align: right;
+    padding-right: 8px;
+    padding-left: 4px;
+}
+
+/* ============================================================================
+   TREE VIEW - RTL BRANCH INDICATORS
+   ============================================================================ */
+
+QTreeView {
+    qproperty-indentation: 20;
+}
+
+QTreeView::branch {
+    /* Mirror branch indicators */
+}
+
+QTreeView::item {
+    text-align: right;
+    padding-right: 8px;
+}
+
+/* ============================================================================
+   LIST WIDGET - RTL ALIGNMENT
+   ============================================================================ */
+
+QListWidget::item {
+    text-align: right;
+    padding-right: 14px;
+    padding-left: 10px;
+}
+
+/* ============================================================================
+   TAB WIDGET - RTL TAB ORDER
+   ============================================================================ */
+
+QTabBar::tab {
+    /* Tabs flow from right to left */
+    margin-left: 2px;
+    margin-right: 0px;
+}
+
+/* ============================================================================
+   GROUP BOX - RTL TITLE POSITION
+   ============================================================================ */
+
+QGroupBox::title {
+    /* Position title on the right */
+    subcontrol-origin: margin;
+    subcontrol-position: top right;
+    right: 10px;
+    left: auto;
+}
+
+/* ============================================================================
+   MENU - RTL ALIGNMENT
+   ============================================================================ */
+
+QMenu::item {
+    /* Adjust padding for RTL */
+    padding: 8px 12px 8px 24px;
+    text-align: right;
+}
+
+QMenu::indicator {
+    /* Move indicator to right side */
+    left: auto;
+    right: 6px;
+}
+
+QMenu::icon {
+    /* Position icons appropriately */
+    left: auto;
+    right: 8px;
+}
+
+/* ============================================================================
+   TOOLBAR - RTL LAYOUT
+   ============================================================================ */
+
+QToolBar {
+    /* Toolbar items flow from right to left */
+}
+
+QToolButton {
+    /* Maintain proper spacing */
+}
+
+/* ============================================================================
+   SCROLL BARS - RTL POSITION
+   ============================================================================ */
+
+/* Vertical scrollbar moves to left side automatically with layoutDirection */
+QScrollBar:vertical {
+    /* Position handled by Qt RTL layout */
+}
+
+/* Horizontal scrollbar direction reverses */
+QScrollBar:horizontal {
+    /* Direction handled by Qt RTL layout */
+}
+
+/* ============================================================================
+   SIDEBAR NAVIGATION - RTL MIRROR
+   ============================================================================ */
+
+QFrame#sidebar {
+    /* Sidebar on right side in RTL */
+    border-right: none;
+    border-left: 2px solid #1a252f;
+}
+
+QFrame#sidebar QListWidget::item {
+    text-align: right;
+    padding-right: 18px;
+    padding-left: 10px;
+}
+
+QFrame#sidebar QListWidget::item:selected {
+    /* Indicator on right side */
+    border-left: none;
+    border-right: 4px solid #27ae60;
+}
+
+/* Dark theme variant */
+QFrame#sidebar[dark="true"] {
+    border-left: 2px solid #0d0d0d;
+}
+
+QFrame#sidebar[dark="true"] QListWidget::item:selected {
+    border-right: 4px solid #66bb6a;
+}
+
+/* ============================================================================
+   DIALOG & MESSAGE BOX - RTL BUTTON ORDER
+   ============================================================================ */
+
+QDialogButtonBox {
+    /* Button order reverses in RTL */
+    qproperty-layoutDirection: RightToLeft;
+}
+
+QMessageBox {
+    qproperty-layoutDirection: RightToLeft;
+}
+
+QMessageBox QLabel {
+    qproperty-alignment: 'AlignRight | AlignVCenter';
+}
+
+/* ============================================================================
+   PROGRESS BAR - RTL DIRECTION
+   ============================================================================ */
+
+QProgressBar {
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    /* Progress fills from right to left */
+}
+
+/* ============================================================================
+   CHECKBOXES & RADIO BUTTONS - RTL POSITION
+   ============================================================================ */
+
+QCheckBox, QRadioButton {
+    /* Indicator appears on right side */
+    spacing: 8px;
+}
+
+QCheckBox::indicator {
+    /* Position on right */
+    left: auto;
+}
+
+QRadioButton::indicator {
+    /* Position on right */
+    left: auto;
+}
+
+/* ============================================================================
+   STATUS BAR - RTL ALIGNMENT
+   ============================================================================ */
+
+QStatusBar {
+    qproperty-layoutDirection: RightToLeft;
+}
+
+QStatusBar QLabel {
+    qproperty-alignment: AlignRight;
+}
+
+/* ============================================================================
+   SPLITTERS - RTL HANDLING
+   ============================================================================ */
+
+QSplitter {
+    /* Splitter direction handled by Qt */
+}
+
+/* ============================================================================
+   TOOLTIPS - RTL TEXT
+   ============================================================================ */
+
+QToolTip {
+    qproperty-alignment: AlignRight;
+}
+
+/* ============================================================================
+   CUSTOM WIDGETS - RTL ADJUSTMENTS
+   ============================================================================ */
+
+QWidget[card="true"] {
+    /* Cards maintain proper padding */
+    padding: 16px;
+}
+
+QWidget[header="true"] {
+    text-align: right;
+    padding-right: 16px;
+    padding-left: 12px;
+}
+
+QWidget[footer="true"] {
+    text-align: right;
+}
+
+/* ============================================================================
+   FORM LAYOUTS - RTL LABEL ALIGNMENT
+   ============================================================================ */
+
+QFormLayout {
+    qproperty-layoutDirection: RightToLeft;
+}
+
+/* Labels appear on right, fields on left */
+QFormLayout QLabel {
+    qproperty-alignment: 'AlignRight | AlignVCenter';
+    padding-right: 8px;
+}
+
+/* ============================================================================
+   HORIZONTAL LAYOUTS - RTL FLOW
+   ============================================================================ */
+
+QHBoxLayout {
+    /* Items flow from right to left */
+}
+
+/* ============================================================================
+   GRID LAYOUTS - RTL COLUMN ORDER
+   ============================================================================ */
+
+QGridLayout {
+    /* Columns flow from right to left */
+}
+
+/* ============================================================================
+   DATE/TIME PICKERS - RTL FORMAT
+   ============================================================================ */
+
+QDateEdit, QTimeEdit, QDateTimeEdit {
+    qproperty-alignment: AlignRight;
+}
+
+QCalendarWidget {
+    qproperty-layoutDirection: RightToLeft;
+}
+
+QCalendarWidget QWidget {
+    qproperty-layoutDirection: RightToLeft;
+}
+
+QCalendarWidget QTableView {
+    qproperty-layoutDirection: RightToLeft;
+    selection-background-color: #3498db;
+}
+
+/* ============================================================================
+   SEARCH & FILTER BARS - RTL ICONS
+   ============================================================================ */
+
+/* Search icons should appear on right side */
+QLineEdit[search="true"] {
+    padding-right: 32px;
+    padding-left: 10px;
+}
+
+/* ============================================================================
+   BREADCRUMB NAVIGATION - RTL SEPARATORS
+   ============================================================================ */
+
+/* Breadcrumb separators should point left (←) instead of right (→) */
+QLabel[breadcrumb="true"] {
+    qproperty-alignment: AlignRight;
+}
+
+/* ============================================================================
+   NOTES FOR RTL IMPLEMENTATION
+   
+   1. Qt automatically handles most RTL layout when layoutDirection is set
+   2. Custom widgets may need explicit RTL handling in Python code
+   3. Icons with directional meaning (arrows, etc.) should be mirrored
+   4. Text remains in Arabic script, numbers can be Arabic-Indic or Western
+   5. Some complex layouts may need programmatic adjustments
+   
+   ============================================================================ */
+
+/* ============================================================================
+   END OF RTL THEME
+   ============================================================================ */

@@ -1,0 +1,897 @@
+{
+  "metadata": {
+    "generated": "2025-11-13",
+    "project": "Hassad ERP System",
+    "phase": "F1 - UI Flow Analysis",
+    "total_modules": 29,
+    "total_services": 20,
+    "version": "1.0"
+  },
+  "navigation_system": {
+    "entry_point": "ui.login_window.LoginWindow",
+    "main_hub": "ui.main_window.MainWindow",
+    "navigation_type": "hierarchical_sidebar_with_breadcrumbs",
+    "navigation_config": "navigation.json",
+    "module_loading": "dynamic_import_with_caching",
+    "permission_system": "role_based_access_control",
+    "features": [
+      "collapsible_navigation_groups",
+      "breadcrumb_path_display",
+      "toolbar_quick_actions",
+      "accounting_workflow_order",
+      "permission_based_filtering"
+    ],
+    "components": [
+      "ui.components.navigation_widget.NavigationWidget",
+      "ui.components.breadcrumb_widget.BreadcrumbWidget"
+    ]
+  },
+  "module_categories": {
+    "setup_and_configuration": {
+      "display_name": "Setup & Configuration",
+      "display_name_ar": "الإعداد والتكوين",
+      "order": 1,
+      "modules": ["company", "branches", "users", "roles", "settings"],
+      "permission_prefix": "admin",
+      "completion_rate": 0.8,
+      "icon": "⚙️",
+      "color": "#3498db"
+    },
+    "products_and_inventory": {
+      "display_name": "Products & Inventory",
+      "display_name_ar": "المنتجات والمخزون",
+      "order": 2,
+      "modules": ["categories", "products", "stock_movements", "inventory_valuation"],
+      "permission_prefix": "inventory",
+      "completion_rate": 0.5,
+      "icon": "📦",
+      "color": "#27ae60"
+    },
+    "sales_operations": {
+      "display_name": "Sales Operations",
+      "display_name_ar": "عمليات المبيعات",
+      "order": 3,
+      "modules": ["customers", "pos", "sales_history"],
+      "permission_prefix": "sales",
+      "completion_rate": 0.4,
+      "icon": "🛒",
+      "color": "#e74c3c"
+    },
+    "purchase_operations": {
+      "display_name": "Purchase Operations",
+      "display_name_ar": "عمليات المشتريات",
+      "order": 4,
+      "modules": ["suppliers", "purchase_orders", "goods_receipt", "purchase_invoices"],
+      "permission_prefix": "purchases",
+      "completion_rate": 0.3,
+      "icon": "🚚",
+      "color": "#9b59b6"
+    },
+    "accounting_and_finance": {
+      "display_name": "Accounting & Finance",
+      "display_name_ar": "المحاسبة والمالية",
+      "order": 5,
+      "modules": ["accounts", "journals", "trial_balance"],
+      "permission_prefix": "accounting",
+      "completion_rate": 0.3,
+      "icon": "💼",
+      "color": "#f39c12"
+    },
+    "reports_and_analytics": {
+      "display_name": "Reports & Analytics",
+      "display_name_ar": "التقارير والتحليلات",
+      "order": 6,
+      "modules": ["reports"],
+      "permission_prefix": "reports",
+      "completion_rate": 0.2,
+      "icon": "📊",
+      "color": "#1abc9c"
+    }
+  },
+  "ui_modules": [
+    {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "module_path": "ui.main_window",
+      "class_name": "WelcomePage",
+      "permission_required": "dashboard.view",
+      "status": "implemented",
+      "implementation_level": "full",
+      "base_class": "QWidget",
+      "service_binding": null,
+      "features": ["bilingual_welcome", "user_info_display"],
+      "category": "core"
+    },
+    {
+      "id": "company",
+      "name": "Company Settings",
+      "module_path": "ui.company_window",
+      "class_name": "CompanyWindow",
+      "permission_required": "company.view",
+      "status": "implemented",
+      "implementation_level": "full",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "CompanyService",
+        "service_path": "core.services.company_service",
+        "operations": ["create", "update", "load"],
+        "session_scope": true
+      },
+      "ui_pattern": "tabbed_form",
+      "features": [
+        "profile_management",
+        "business_settings",
+        "bilingual_forms",
+        "validation_display"
+      ],
+      "dialogs": [],
+      "category": "administration"
+    },
+    {
+      "id": "branches",
+      "name": "Branch Management",
+      "module_path": "ui.branches_window",
+      "class_name": "BranchesWindow",
+      "permission_required": "branches.view",
+      "status": "implemented",
+      "implementation_level": "full",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "BranchService",
+        "service_path": "core.services.branch_service",
+        "operations": ["create", "update", "delete", "get_all"],
+        "session_scope": true
+      },
+      "ui_pattern": "table_with_dialog_crud",
+      "features": [
+        "search_filter",
+        "qtable_display",
+        "crud_operations",
+        "bilingual_ui"
+      ],
+      "dialogs": ["BranchDialog"],
+      "category": "administration"
+    },
+    {
+      "id": "users",
+      "name": "Users",
+      "module_path": "ui.users_window",
+      "class_name": "UsersWindow",
+      "permission_required": "users.view",
+      "status": "implemented",
+      "implementation_level": "full",
+      "base_class": "ModuleMainWindow",
+      "service_binding": {
+        "service": "UserService",
+        "service_path": "core.services.user_service",
+        "operations": ["create", "update", "delete", "get_all"],
+        "session_scope": true,
+        "additional_queries": ["Role", "Company", "Branch"]
+      },
+      "ui_pattern": "table_with_dialog_crud",
+      "features": [
+        "search_filter",
+        "role_assignment",
+        "company_branch_linking",
+        "password_management",
+        "bilingual_ui"
+      ],
+      "dialogs": ["UserDialog"],
+      "category": "administration"
+    },
+    {
+      "id": "roles",
+      "name": "Roles & Permissions",
+      "module_path": "ui.roles_window",
+      "class_name": "RolesWindow",
+      "permission_required": "roles.view",
+      "status": "implemented",
+      "implementation_level": "full",
+      "base_class": "ModuleMainWindow",
+      "service_binding": {
+        "service": "RoleService",
+        "service_path": "core.services.role_service",
+        "operations": ["create", "update", "delete", "get_all"],
+        "session_scope": true
+      },
+      "ui_pattern": "table_with_dialog_crud",
+      "features": [
+        "permission_management",
+        "role_hierarchy",
+        "crud_operations"
+      ],
+      "dialogs": ["RoleDialog"],
+      "category": "administration"
+    },
+    {
+      "id": "settings",
+      "name": "System Settings",
+      "module_path": "ui.settings_window",
+      "class_name": "SettingsWindow",
+      "permission_required": "settings.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "SettingsService",
+        "service_path": "core.services.settings_service",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "administration",
+      "todos": ["Implement settings CRUD", "Add configuration sections"]
+    },
+    {
+      "id": "accounts",
+      "name": "Chart of Accounts",
+      "module_path": "ui.accounts_window",
+      "class_name": "AccountsWindow",
+      "permission_required": "accounting.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "AccountService",
+        "service_path": "core.services.account_service",
+        "operations": ["get_all"],
+        "session_scope": false
+      },
+      "ui_pattern": "table_basic",
+      "features": ["basic_table_display"],
+      "dialogs": [],
+      "category": "accounting",
+      "todos": [
+        "Implement account hierarchy tree view",
+        "Add account CRUD with parent-child relationships",
+        "Implement account balance calculation",
+        "Add account type classification"
+      ]
+    },
+    {
+      "id": "journals",
+      "name": "Journal Entries",
+      "module_path": "ui.journals_window",
+      "class_name": "JournalsWindow",
+      "permission_required": "accounting.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "JournalService",
+        "service_path": "core.services.journal_service",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "accounting",
+      "todos": [
+        "Implement journal entry form with debit/credit lines",
+        "Add double-entry validation",
+        "Implement posting and reversal logic",
+        "Add period locking"
+      ]
+    },
+    {
+      "id": "trial_balance",
+      "name": "Trial Balance",
+      "module_path": "ui.trial_balance_window",
+      "class_name": "TrialBalanceWindow",
+      "permission_required": "accounting.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "TrialBalanceService",
+        "service_path": "core.services.trial_balance_service",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "accounting",
+      "todos": [
+        "Implement date range selection",
+        "Add trial balance calculation",
+        "Implement drill-down to journals",
+        "Add export to PDF/Excel"
+      ]
+    },
+    {
+      "id": "products",
+      "name": "Products",
+      "module_path": "ui.products_window",
+      "class_name": "ProductsWindow",
+      "permission_required": "inventory.view",
+      "status": "implemented",
+      "implementation_level": "full",
+      "base_class": "ModuleMainWindow",
+      "service_binding": {
+        "service": "ProductService",
+        "service_path": "core.services.product_service",
+        "operations": ["create", "update", "delete", "get_all"],
+        "session_scope": true,
+        "additional_queries": ["Category", "Unit"]
+      },
+      "ui_pattern": "table_with_dialog_crud",
+      "features": [
+        "search_filter",
+        "bilingual_names",
+        "category_linking",
+        "unit_management",
+        "batch_tracking",
+        "expiry_tracking"
+      ],
+      "dialogs": ["ProductDialog"],
+      "category": "inventory"
+    },
+    {
+      "id": "categories",
+      "name": "Categories",
+      "module_path": "ui.categories_window",
+      "class_name": "CategoriesWindow",
+      "permission_required": "inventory.view",
+      "status": "implemented",
+      "implementation_level": "full",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "CategoryService",
+        "service_path": "core.services.category_service",
+        "operations": ["create", "update", "delete", "get_all"],
+        "session_scope": true
+      },
+      "ui_pattern": "table_with_dialog_crud",
+      "features": [
+        "hierarchy_support",
+        "bilingual_names",
+        "crud_operations"
+      ],
+      "dialogs": ["CategoryDialog"],
+      "category": "inventory"
+    },
+    {
+      "id": "stock_movements",
+      "name": "Stock Movements",
+      "module_path": "ui.stock_movements_window",
+      "class_name": "StockMovementsWindow",
+      "permission_required": "inventory.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "StockMovementService",
+        "service_path": "core.services.stock_movement_service",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "inventory",
+      "todos": [
+        "Implement movement types (adjustment, transfer, etc.)",
+        "Add quantity adjustment logic",
+        "Implement batch/serial tracking",
+        "Add approval workflow"
+      ]
+    },
+    {
+      "id": "inventory_valuation",
+      "name": "Inventory Valuation",
+      "module_path": "ui.inventory_valuation_window",
+      "class_name": "InventoryValuationWindow",
+      "permission_required": "inventory.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "InventoryValuationService",
+        "service_path": "core.services.inventory_valuation_service",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "inventory",
+      "todos": [
+        "Implement valuation methods (FIFO, LIFO, Average)",
+        "Add cost calculation",
+        "Implement report generation",
+        "Add comparison across periods"
+      ]
+    },
+    {
+      "id": "customers",
+      "name": "Customers",
+      "module_path": "ui.customers_window",
+      "class_name": "CustomersWindow",
+      "permission_required": "sales.view",
+      "status": "implemented",
+      "implementation_level": "full",
+      "base_class": "ModuleMainWindow",
+      "service_binding": {
+        "service": "CustomerService",
+        "service_path": "core.services.customer_service",
+        "operations": ["create", "update", "delete", "get_all"],
+        "session_scope": true
+      },
+      "ui_pattern": "table_with_dialog_crud",
+      "features": [
+        "contact_management",
+        "address_management",
+        "credit_limit_tracking",
+        "bilingual_ui"
+      ],
+      "dialogs": ["CustomerDialog"],
+      "category": "sales"
+    },
+    {
+      "id": "pos",
+      "name": "POS",
+      "module_path": "ui.pos_interface_window",
+      "class_name": "POSInterfaceWindow",
+      "permission_required": "sales.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "POSService",
+        "service_path": "core.services.pos_service",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "sales",
+      "todos": [
+        "Implement product selection grid",
+        "Add shopping cart management",
+        "Implement payment processing (cash, card, split)",
+        "Add receipt printing",
+        "Implement customer lookup during sale"
+      ]
+    },
+    {
+      "id": "sales_history",
+      "name": "Sales History",
+      "module_path": "ui.sales_history_window",
+      "class_name": "SalesHistoryWindow",
+      "permission_required": "sales.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "SaleService",
+        "service_path": "core.services.sale_service",
+        "operations": ["get_all"],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "sales",
+      "todos": [
+        "Implement date range filters",
+        "Add customer/product filtering",
+        "Implement invoice viewing",
+        "Add return/refund functionality"
+      ]
+    },
+    {
+      "id": "suppliers",
+      "name": "Suppliers",
+      "module_path": "ui.suppliers_window",
+      "class_name": "SuppliersWindow",
+      "permission_required": "purchases.view",
+      "status": "implemented",
+      "implementation_level": "full",
+      "base_class": "ModuleMainWindow",
+      "service_binding": {
+        "service": "SupplierService",
+        "service_path": "core.services.supplier_service",
+        "operations": ["create", "update", "delete", "get_all"],
+        "session_scope": true
+      },
+      "ui_pattern": "table_with_dialog_crud",
+      "features": [
+        "contact_management",
+        "address_management",
+        "payment_terms",
+        "bilingual_ui"
+      ],
+      "dialogs": ["SupplierDialog"],
+      "category": "purchases"
+    },
+    {
+      "id": "purchase_orders",
+      "name": "Purchase Orders",
+      "module_path": "ui.purchase_orders_window",
+      "class_name": "PurchaseOrdersWindow",
+      "permission_required": "purchases.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "PurchaseOrderService",
+        "service_path": "core.services.purchase_order_service",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "purchases",
+      "todos": [
+        "Implement PO header and line items",
+        "Add supplier selection and product selection",
+        "Implement approval workflow",
+        "Add PO status tracking",
+        "Implement email sending to supplier"
+      ]
+    },
+    {
+      "id": "goods_receipt",
+      "name": "Goods Receipt",
+      "module_path": "ui.goods_receipt_window",
+      "class_name": "GoodsReceiptWindow",
+      "permission_required": "purchases.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "GoodsReceiptService",
+        "service_path": "core.services.goods_receipt_service",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "purchases",
+      "todos": [
+        "Implement GRN creation linked to PO",
+        "Add quantity verification",
+        "Implement stock update automation",
+        "Add quality inspection workflow"
+      ]
+    },
+    {
+      "id": "purchase_invoices",
+      "name": "Purchase Invoices",
+      "module_path": "ui.purchase_invoices_window",
+      "class_name": "PurchaseInvoicesWindow",
+      "permission_required": "purchases.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "PurchaseInvoiceService",
+        "service_path": "core.services.purchase_invoice_service",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "purchases",
+      "todos": [
+        "Implement invoice entry linked to GRN",
+        "Add three-way matching (PO-GRN-Invoice)",
+        "Implement payment tracking",
+        "Add accounting integration"
+      ]
+    },
+    {
+      "id": "reports",
+      "name": "Reports",
+      "module_path": "ui.reports_window",
+      "class_name": "ReportsWindow",
+      "permission_required": "reports.view",
+      "status": "partial",
+      "implementation_level": "skeleton",
+      "base_class": "ModuleWidget",
+      "service_binding": {
+        "service": "Multiple",
+        "service_path": "core.services",
+        "operations": [],
+        "session_scope": false
+      },
+      "ui_pattern": "placeholder",
+      "features": [],
+      "dialogs": [],
+      "category": "reporting",
+      "todos": [
+        "Implement financial reports (Balance Sheet, Income Statement)",
+        "Add inventory reports (Stock Summary, Movements)",
+        "Implement sales analytics",
+        "Add purchasing reports",
+        "Implement export to PDF/Excel/CSV"
+      ]
+    }
+  ],
+  "ui_patterns": {
+    "table_with_dialog_crud": {
+      "used_in": [
+        "branches",
+        "users",
+        "roles",
+        "products",
+        "categories",
+        "customers",
+        "suppliers"
+      ],
+      "components": ["QTableWidget", "QDialog", "Search Bar", "Action Buttons"],
+      "modernization_target": "QTableView + QAbstractTableModel with pagination"
+    },
+    "tabbed_form": {
+      "used_in": ["company"],
+      "components": ["QTabWidget", "QFormLayout", "Save Button"],
+      "modernization_target": "Responsive grid layout with live validation"
+    },
+    "placeholder": {
+      "used_in": [
+        "settings",
+        "journals",
+        "trial_balance",
+        "stock_movements",
+        "inventory_valuation",
+        "pos",
+        "sales_history",
+        "purchase_orders",
+        "goods_receipt",
+        "purchase_invoices",
+        "reports"
+      ],
+      "components": ["Basic QWidget with coming soon message"],
+      "modernization_target": "Complete implementation with modern patterns"
+    }
+  },
+  "service_layer": {
+    "base_service": "core.services.base_service.BaseService",
+    "services": [
+      {
+        "name": "CompanyService",
+        "path": "core.services.company_service",
+        "model": "Company",
+        "ui_modules": ["company"]
+      },
+      {
+        "name": "BranchService",
+        "path": "core.services.branch_service",
+        "model": "Branch",
+        "ui_modules": ["branches"]
+      },
+      {
+        "name": "UserService",
+        "path": "core.services.user_service",
+        "model": "User",
+        "ui_modules": ["users"]
+      },
+      {
+        "name": "RoleService",
+        "path": "core.services.role_service",
+        "model": "Role",
+        "ui_modules": ["roles"]
+      },
+      {
+        "name": "ProductService",
+        "path": "core.services.product_service",
+        "model": "Product",
+        "ui_modules": ["products"]
+      },
+      {
+        "name": "CategoryService",
+        "path": "core.services.category_service",
+        "model": "Category",
+        "ui_modules": ["categories"]
+      },
+      {
+        "name": "CustomerService",
+        "path": "core.services.customer_service",
+        "model": "Customer",
+        "ui_modules": ["customers"]
+      },
+      {
+        "name": "SupplierService",
+        "path": "core.services.supplier_service",
+        "model": "Supplier",
+        "ui_modules": ["suppliers"]
+      },
+      {
+        "name": "AccountService",
+        "path": "core.services.account_service",
+        "model": "Account",
+        "ui_modules": ["accounts"]
+      },
+      {
+        "name": "JournalService",
+        "path": "core.services.journal_service",
+        "model": "JournalEntry",
+        "ui_modules": ["journals"]
+      },
+      {
+        "name": "TrialBalanceService",
+        "path": "core.services.trial_balance_service",
+        "model": null,
+        "ui_modules": ["trial_balance"]
+      },
+      {
+        "name": "StockMovementService",
+        "path": "core.services.stock_movement_service",
+        "model": "StockMovement",
+        "ui_modules": ["stock_movements"]
+      },
+      {
+        "name": "InventoryValuationService",
+        "path": "core.services.inventory_valuation_service",
+        "model": null,
+        "ui_modules": ["inventory_valuation"]
+      },
+      {
+        "name": "POSService",
+        "path": "core.services.pos_service",
+        "model": "Sale",
+        "ui_modules": ["pos"]
+      },
+      {
+        "name": "SaleService",
+        "path": "core.services.sale_service",
+        "model": "Sale",
+        "ui_modules": ["sales_history"]
+      },
+      {
+        "name": "PurchaseOrderService",
+        "path": "core.services.purchase_order_service",
+        "model": "PurchaseOrder",
+        "ui_modules": ["purchase_orders"]
+      },
+      {
+        "name": "GoodsReceiptService",
+        "path": "core.services.goods_receipt_service",
+        "model": "GoodsReceipt",
+        "ui_modules": ["goods_receipt"]
+      },
+      {
+        "name": "PurchaseInvoiceService",
+        "path": "core.services.purchase_invoice_service",
+        "model": "PurchaseInvoice",
+        "ui_modules": ["purchase_invoices"]
+      },
+      {
+        "name": "SettingsService",
+        "path": "core.services.settings_service",
+        "model": "Settings",
+        "ui_modules": ["settings"]
+      }
+    ]
+  },
+  "bilingual_support": {
+    "implementation": "inline_english_arabic",
+    "format": "English Text | النص العربي",
+    "validation_messages": {
+      "location": "core.services.base_service.VALIDATION_MESSAGES",
+      "structure": "key -> {en: string, ar: string}"
+    },
+    "rtl_support": "not_implemented",
+    "language_toggle": "not_implemented"
+  },
+  "user_journey": {
+    "current_flow": [
+      "Login",
+      "Main Window with Hierarchical Navigation",
+      "Module Selection (via Sidebar/Breadcrumb/Toolbar)",
+      "Module Display with Context"
+    ],
+    "implemented_features": [
+      "Hierarchical sidebar with collapsible groups",
+      "Breadcrumb navigation for context awareness",
+      "Toolbar quick actions (Ctrl+N for New Sale, Ctrl+R for Reports)",
+      "Accounting workflow ordering",
+      "Permission-based module visibility"
+    ],
+    "navigation_patterns": [
+      "Direct access via sidebar groups",
+      "Quick actions via toolbar shortcuts",
+      "Backtracking via breadcrumb",
+      "Home via breadcrumb or Dashboard button"
+    ],
+    "missing_elements": [
+      "Dashboard with KPIs",
+      "Setup wizard for first-time users",
+      "Guided workflows for transactions",
+      "Search/filter in navigation"
+    ],
+    "recommended_flow": [
+      "Login",
+      "Dashboard (Overview + Quick Actions)",
+      [
+        "Setup Wizard (if first-time)",
+        "Transaction Workflows (guided)",
+        "Direct Module Access via hierarchical navigation",
+        "Reports & Analytics"
+      ]
+    ]
+  },
+  "technical_debt": [
+    {
+      "issue": "QTableWidget usage",
+      "affected_modules": 15,
+      "impact": "medium",
+      "effort": "high",
+      "priority": "P2"
+    },
+    {
+      "issue": "Dialog direct DB queries",
+      "affected_modules": 5,
+      "impact": "low",
+      "effort": "low",
+      "priority": "P3"
+    },
+    {
+      "issue": "No pagination",
+      "affected_modules": 15,
+      "impact": "high",
+      "effort": "medium",
+      "priority": "P2"
+    },
+    {
+      "issue": "Incomplete modules",
+      "affected_modules": 13,
+      "impact": "high",
+      "effort": "high",
+      "priority": "P1"
+    },
+    {
+      "issue": "Missing RTL support",
+      "affected_modules": 29,
+      "impact": "medium",
+      "effort": "medium",
+      "priority": "P2"
+    }
+  ],
+  "modernization_recommendations": {
+    "phase_f2": {
+      "name": "Theme & Concept Design",
+      "duration_weeks": "2-3",
+      "deliverables": [
+        "Modern theme system (light/dark/rtl)",
+        "UI component library design",
+        "Style guide documentation"
+      ]
+    },
+    "phase_f3": {
+      "name": "Core Module Completion",
+      "duration_weeks": "4-6",
+      "deliverables": [
+        "Complete accounting modules",
+        "Complete POS interface",
+        "Complete purchase workflow"
+      ]
+    },
+    "phase_f4": {
+      "name": "UI Pattern Migration",
+      "duration_weeks": "6-8",
+      "deliverables": [
+        "Migrate to QTableView pattern",
+        "Implement pagination",
+        "Add bulk actions"
+      ]
+    },
+    "phase_f5": {
+      "name": "Workflows & Dashboard",
+      "duration_weeks": "3-4",
+      "deliverables": [
+        "Build dashboard with KPIs",
+        "Create setup wizard",
+        "Implement guided workflows"
+      ]
+    }
+  }
+}
