@@ -46,25 +46,24 @@ def test_engine():
 
 
 @pytest.fixture(scope="function")
-def db_session(test_engine):
-    """Create an isolated database session for each test.
+def db_session():
+    """Create a fully isolated database session for each test.
 
-    The session is bound to a single connection wrapped in an outer
-    transaction that is always rolled back on teardown. ``commit()`` calls
-    made inside a test are turned into SAVEPOINT releases
-    (``join_transaction_mode="create_savepoint"``), so committed fixture data
-    never leaks into other tests. This guarantees per-test isolation even
-    though the in-memory SQLite engine is shared for the whole session.
+    Each test gets its own fresh in-memory SQLite database with a clean
+    schema. This guarantees per-test isolation regardless of commits made by
+    fixtures or the test body (committed rows cannot leak across tests and
+    cause spurious UNIQUE/constraint failures), which is essential for an
+    accounting system where test independence must be reliable.
     """
-    connection = test_engine.connect()
-    transaction = connection.begin()
-    session = Session(bind=connection, join_transaction_mode="create_savepoint")
+    engine = create_engine("sqlite:///:memory:", echo=False)
+    Base.metadata.create_all(engine)
+    session = Session(bind=engine)
     try:
         yield session
     finally:
         session.close()
-        transaction.rollback()
-        connection.close()
+        Base.metadata.drop_all(engine)
+        engine.dispose()
 
 
 @pytest.fixture
