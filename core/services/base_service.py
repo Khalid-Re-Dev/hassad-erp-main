@@ -56,6 +56,10 @@ VALIDATION_MESSAGES = {
     'invalid_data': {
         'en': 'Invalid data provided',
         'ar': 'البيانات المقدمة غير صالحة'
+    },
+    'negative_amount': {
+        'en': 'Amount cannot be negative',
+        'ar': 'لا يمكن أن تكون القيمة سالبة'
     }
 }
 
