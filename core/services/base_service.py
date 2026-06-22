@@ -60,6 +60,18 @@ VALIDATION_MESSAGES = {
     'negative_amount': {
         'en': 'Amount cannot be negative',
         'ar': 'لا يمكن أن تكون القيمة سالبة'
+    },
+    'invalid_type': {
+        'en': 'Invalid value for this field',
+        'ar': 'قيمة غير صالحة لهذا الحقل'
+    },
+    'cannot_modify_type': {
+        'en': 'Account type cannot be changed once the account has journal entries',
+        'ar': 'لا يمكن تغيير نوع الحساب بعد وجود قيود محاسبية عليه'
+    },
+    'system_protected': {
+        'en': 'System accounts cannot be deleted',
+        'ar': 'لا يمكن حذف حسابات النظام'
     }
 }
 
