@@ -456,6 +456,30 @@ class BaseService(ABC):
         
         return errors
     
+    def _validate_non_negative(
+        self, data: Dict[str, Any], field: str
+    ) -> List[ValidationError]:
+        """
+        Validate that a numeric/monetary field, if provided, is not negative.
+
+        Args:
+            data: Input data dictionary.
+            field: Field name to check.
+
+        Returns:
+            List of validation errors (empty if valid, or field absent/empty).
+        """
+        from decimal import Decimal, InvalidOperation
+
+        errors: List[ValidationError] = []
+        if field in data and data[field] is not None and str(data[field]).strip() != "":
+            try:
+                if Decimal(str(data[field])) < 0:
+                    errors.append(ValidationError(field, 'negative_amount'))
+            except (InvalidOperation, ValueError, TypeError):
+                errors.append(ValidationError(field, 'invalid_data'))
+        return errors
+
     # ========================
     # Helper Methods
     # ========================

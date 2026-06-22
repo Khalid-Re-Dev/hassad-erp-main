@@ -4,7 +4,6 @@ Customer Service Layer.
 Provides business logic and CRUD operations for Customer management.
 """
 
-from decimal import Decimal, InvalidOperation
 from typing import Any, Dict, List, Optional, Tuple
 
 from sqlalchemy.orm import Session
@@ -91,28 +90,6 @@ class CustomerService(BaseService):
         # Credit balance, when explicitly provided, must not be negative.
         errors.extend(self._validate_non_negative(data, "credit_balance"))
 
-        return errors
-
-    def _validate_non_negative(
-        self, data: Dict[str, Any], field: str
-    ) -> List[ValidationError]:
-        """
-        Validate that a monetary field, if provided, is not negative.
-
-        Args:
-            data: Input data dictionary.
-            field: Field name to check.
-
-        Returns:
-            List of validation errors (empty if valid or field absent/empty).
-        """
-        errors: List[ValidationError] = []
-        if field in data and data[field] is not None and str(data[field]).strip() != "":
-            try:
-                if Decimal(str(data[field])) < 0:
-                    errors.append(ValidationError(field, "negative_amount"))
-            except (InvalidOperation, ValueError, TypeError):
-                errors.append(ValidationError(field, "invalid_data"))
         return errors
 
     # ========================
