@@ -52,15 +52,12 @@ class CategoryService(BaseService):
         # Max length validation
         field_limits = {'name_en': 255, 'name_ar': 255, 'description': 500}
         errors.extend(self._validate_max_length(data, field_limits))
-        
-        # Email validation
-        if 'email' in data and data['email']:
-            errors.extend(self._validate_email(data, 'email'))
-        
-        # Phone validation
-        if 'phone' in data and data['phone']:
-            errors.extend(self._validate_phone(data, 'phone'))
-        
+
+        # A category cannot be its own parent (prevents a trivial cycle).
+        if is_update and instance is not None and data.get('parent_id') is not None:
+            if data['parent_id'] == instance.id:
+                errors.append(ValidationError('parent_id', 'invalid_data'))
+
         return errors
 
     def _can_delete(
